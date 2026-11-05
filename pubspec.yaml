@@ -1,0 +1,18 @@
+name: campustrade_upi_yptk
+description: "CampusTrade UPI YPTK Padang — Bursa Inventaris & Perabotan Kos Mahasiswa Terverifikasi Lubuk Begalung (Full-Width Responsive v8)."
+publish_to: 'none'
+version: 2.4.0+8
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
