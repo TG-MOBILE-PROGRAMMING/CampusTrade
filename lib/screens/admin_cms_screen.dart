@@ -1341,7 +1341,7 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: status,
+                          initialValue: status,
                           decoration: const InputDecoration(
                               labelText: 'Status Verifikasi', isDense: true),
                           items: const [
@@ -2192,7 +2192,7 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
                   _dialogField('No. WhatsApp *', waCtrl),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: status,
+                    initialValue: status,
                     decoration: const InputDecoration(
                         labelText: 'Status Verifikasi', isDense: true),
                     items: const [
@@ -2209,7 +2209,7 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: role,
+                    initialValue: role,
                     decoration:
                         const InputDecoration(labelText: 'Role', isDense: true),
                     items: const [
@@ -2555,7 +2555,7 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: kategori,
+                          initialValue: kategori,
                           decoration: const InputDecoration(
                               labelText: 'Kategori Zona', isDense: true),
                           items: const [
@@ -2577,7 +2577,7 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: status,
+                          initialValue: status,
                           decoration: const InputDecoration(
                               labelText: 'Status', isDense: true),
                           items: const [

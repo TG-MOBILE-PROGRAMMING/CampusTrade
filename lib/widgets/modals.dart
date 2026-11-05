@@ -969,7 +969,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                               children: [
                                 _fieldLabel('KATEGORI *'),
                                 DropdownButtonFormField<String>(
-                                  value: _selectedCategory,
+                                  initialValue: _selectedCategory,
                                   isExpanded: true,
                                   style: SwissTheme.sans(size: 12),
                                   decoration: _inputDecoration(''),
@@ -1064,7 +1064,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
 
                       _fieldLabel('GRADING KONDISI FISIK *'),
                       DropdownButtonFormField<String>(
-                        value: _selectedCondition,
+                        initialValue: _selectedCondition,
                         isExpanded: true,
                         style: SwissTheme.sans(size: 12),
                         decoration: _inputDecoration(''),
@@ -1086,7 +1086,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                               children: [
                                 _fieldLabel('METODE SERAH TERIMA *'),
                                 DropdownButtonFormField<String>(
-                                  value: _selectedDelivery,
+                                  initialValue: _selectedDelivery,
                                   isExpanded: true,
                                   style: SwissTheme.sans(size: 12),
                                   decoration: _inputDecoration(''),
@@ -1121,7 +1121,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                               children: [
                                 _fieldLabel('TITIK TEMU COD UTAMA *'),
                                 DropdownButtonFormField<String>(
-                                  value: _selectedCodSpot,
+                                  initialValue: _selectedCodSpot,
                                   isExpanded: true,
                                   style: SwissTheme.sans(size: 12),
                                   decoration: _inputDecoration(''),
@@ -1723,7 +1723,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         const SizedBox(height: 10),
         _fieldLabel('PROGRAM STUDI *'),
         DropdownButtonFormField<String>(
-          value: _regJurusan,
+          initialValue: _regJurusan,
           isExpanded: true,
           style: SwissTheme.sans(size: 12),
           decoration: _inputDecoration(''),

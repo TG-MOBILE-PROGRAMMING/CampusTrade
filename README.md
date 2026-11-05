@@ -1,73 +1,107 @@
-# CampusTrade UPI YPTK Padang — Flutter Edition (v8 Full-Width Responsive)
+# CampusTrade UPI YPTK Padang
 
-Hasil konversi penuh dari aplikasi web **CampusTrade UPI YPTK Padang (`campustrade_upi_yptk_fullwidth_responsive_v8`)** ke **Flutter** (mendukung Android, iOS, Web, Windows, macOS, dan Linux) dengan arsitektur **Anti-Slop Swiss Editorial Design System** dan **Zero External Plugin Conflict**.
+Platform bursa barang bekas dan logistik mikro berbasis komunitas kampus yang dirancang khusus untuk civitas akademika Universitas Putra Indonesia "YPTK" Padang. Sistem ini menggabungkan kurasi fisik (Quality Control), transaksi aman berbasis titik temu (COD Geospasial), dan verifikasi identitas resmi mahasiswa (NIM/KTM).
 
-## Fitur Lengkap yang Dikonversi (100% Parity)
+## Tim Pengembang
 
-### 1. Etalase Publik & Katalog Mahasiswa (`CatalogScreen`)
-- **Announcement Status Bar**: Menampilkan teks pengumuman dinamis dari pengaturan Admin CMS serta koordinat referensi Lubuk Begalung (`-0.9575, 100.3972`).
-- **Sticky Precision Header & Navbar**: Pencarian real-time (Desktop & Mobile), indikator status verifikasi akun (`VERIFIED`, `PENDING`, `REJECTED`), tombol akses cepat ke **Admin CMS** (khusus role Admin), dan tombol **Jual Barang** dengan *Verification Gatekeeper*.
-- **Flash Notification Bar & Pending KTM Banner**: Notifikasi sukses/peringatan/error yang dapat ditutup serta banner konfirmasi WhatsApp bagi akun yang sedang menunggu validasi KTM.
-- **Swiss Editorial Hero & Telemetry Bento Grid**: Menampilkan statistik katalog terkurasi, jumlah titik COD aktif, status `ESCROW ON`, dan SOP Protokol Anti-Penipuan.
-- **Geospatial Radar Map Interaktif (`GeospatialMapWidget`)**:
-  - Pemetaan posisi kosan penjual terhadap titik COD resmi di sekitar kampus UPI YPTK Lubuk Begalung.
-  - Filter radius jarak real-time (`SEMUA (< 5.0 KM)`, `< 0.5 KM (JALAN KAKI)`, `< 1.0 KM (ZONA INTI)`, `< 2.0 KM (LUBEG RAYA)`).
-  - Tombol **Perbesar Peta / Kecilkan Peta**, fitur *zoom/pan*, pin titik COD resmi (`🏛️`, `📍`, `🏪`), serta pin harga unit kos (`Rp 180k`, dll.) yang menampilkan popup interaktif dan membuka modal detail.
-- **Filter Kategori Architectural Tabs & Product Grid**:
-  - 10 tab kategori (`Semua Unit`, `Perabotan Kos`, `Elektronik`, `Gadget & Komputer`, `Buku & Modul`, `Alat Masak`, `Kendaraan & Helm`, `Fashion Kuliah`, `Harian & Hobi`, `Lain-lain`).
-  - Kartu produk dengan tag `QC PASS`, jarak Haversine (`KM` dari kampus), kondisi fisik, persentase penghematan (`-60%`), opsi hapus untuk pemilik/admin, dan tombol `INSPEKSI ->`.
-- **Zona Titik Temu COD Resmi & Mobile Bottom Navigation Bar**: Daftar titik temu COD aktif beserta navigasi bawah responsif untuk perangkat mobile.
+| No | Nama Lengkap | NIM |
+| :--- | :--- | :--- |
+| 1 | **Muhammad Iqbal Maulana** | `24101152610172` |
+| 2 | **Okta Khairul Ramadhan** | `24101152610177` |
+| 3 | **Try Anggara Yofa** | `24101152610222` |
 
-### 2. Modal Interaktif (`Modals`)
-- **Modal Detail Produk (`ProductDetailModal`)**:
-  - Spesifikasi lengkap, perbandingan harga buka vs harga baru, dan badge jarak.
-  - **Peta Mini Rute Kos Penjual <-> Titik COD Kampus** dengan garis rute putus-putus.
-  - **Laporan Inspeksi Fisik (QC Admin)**.
-  - **Kalkulator Biaya Transparan**: Pilihan *Jemput COD di Kampus (Rp 0)* atau *Kurir Admin Antar-Kos (+Ongkir)* lengkap dengan rincian Harga Unit + Jasa Verifikasi Fisik & Rekber Admin + Ongkir Kurir.
-  - **Integrasi Pesan WhatsApp Otomatis**: Menghasilkan format pesan transaksi lengkap dan siap dikirim ke WhatsApp Admin.
-- **Modal Jual Barang (`SellProductModal`)**:
-  - Formulir listing barang kos dengan **Kalkulator Estimasi Bersih Diterima Penjual** secara otomatis berdasarkan kategori & rentang harga (`fee_verifikasi_kecil`, `fee_verifikasi_standar`, `fee_verifikasi_besar`).
-  - **Pinpoint Coordinate Picker Map**: Geser atau ketuk peta untuk menyematkan koordinat GPS lokasi kos secara presisi.
-- **Modal Otentikasi Civitas (`AuthModal`)**:
-  - **Tab Masuk**: Login dengan NIM atau Username unik + proteksi *Rate Limiting Anti-Brute Force* (maks 5x gagal per 15 menit).
-  - **Tab Registrasi KTM**: Pendaftaran akun mahasiswa baru dengan validasi format username, keunikan NIM, dan simulasi unggah berkas KTM/KRS (`status_verifikasi = pending`).
-  - **Tab Reset Sandi**: Pemulihan kata sandi mandiri menggunakan validasi kecocokan 14 digit NIM dan nomor WhatsApp terdaftar.
+## Latar Belakang & Masalah
 
-### 3. Konsol Administrator (`AdminCmsScreen`) — Dual Responsive
-- **1. Ringkasan & Trafik (`Dashboard`)**:
-  - Alert antrean verifikasi KTM, 4 KPI Bento Cards (Trafik Kunjungan, Sesi Online Real-time, Unit Katalog & Antrean QC, Potensi Fee Verifikasi & Valuasi Bursa).
-  - Grafik **Tren Kunjungan Harian (7 Hari Terakhir)** & **Donut Chart Komposisi Kategori**.
-  - Tabel **Pengguna Sedang Online**, tabel **Listing Barang Terbaru**, **Distribusi Titik COD**, dan **Peta Perimeter Kampus**.
-- **2. Inventaris & QC Barang (`Products`)**:
-  - Dual Responsive (Kartu Mobile `< 1024px` & Tabel Swiss Desktop `>= 1024px`).
-  - Filter status (`Semua`, `Pending`, `Approved`), kategori, dan kata kunci.
-  - Aksi 1-klik `APPROVE`, modal **Edit Unit & Laporan QC Admin**, serta `DEL`.
-- **3. Verifikasi KTM & User (`Users`)**:
-  - Dual Responsive (Kartu Mobile `< 1024px` & Tabel Swiss Desktop `>= 1024px`).
-  - Modal **Inspeksi Dokumen KTM/KRS**, tombol **Setujui KTM**, modal **Tolak Verifikasi KTM** dengan template alasan penolakan, modal **Registrasi Akun Manual**, **Edit Profil Pengguna**, **Reset Sandi Cepat (`KEY`)**, dan hapus akun.
-- **4. Zona Titik COD Resmi (`COD Spots`)**:
-  - Protokol fleksibilitas zona COD, metrik titik aktif/cadangan, toggle status 1-klik (`AKTIF` / `NONAKTIF`), modal **Tambah Titik COD Baru**, **Edit Titik COD**, dan hapus titik.
-- **5. Tarif Fee & Ongkir (`Settings`)**:
-  - Pengaturan dinamis Fee Verifikasi (`Standar`, `Unit Kecil`, `Unit Besar`), Tarif Ekspedisi (`Ongkir Dasar`, `Tarif per KM`, `Handling Berat`, `Max Radius`), Rekening Rekber, WhatsApp Admin, dan Teks Pengumuman Status Bar, ditambah panel **Telemetri Server & Keamanan (OWASP Hardened)**.
+Setiap siklus semester baru atau kelulusan, mahasiswa kos di sekitar Lubuk Begalung menghadapi kendala klasik:
 
-## Akun Demo Bawaan (Seed Data `schema.sql`)
+1. **Tingginya Resiko Penipuan**: Transaksi jual-beli di forum media sosial umum minim akuntabilitas dan rawan penipuan identitas.
+2. **Kondisi Fisik Barang Tidak Akurat**: Deskripsi penjual kerap tidak sesuai dengan kondisi riil barang bekas (elektronik, perabotan, buku).
+3. **Kendala Transportasi & Jarak**: Mahasiswa kesulitan memperkirakan jarak kosan penjual dan menentukan titik temu yang aman di area kampus.
 
-| Peran | Username | NIM | Kata Sandi | Status KTM |
+**CampusTrade** dirancang sebagai solusi terpadu untuk menyelesaikan masalah tersebut dengan membatasi ekosistem transaksi hanya untuk mahasiswa terverifikasi, didukung inspeksi fisik barang, serta penentuan rute transaksi berbasis koordinat presisi.
+
+## Arsitektur Sistem & Fitur Utama
+
+Aplikasi dibangun menggunakan **Flutter Multiplatform** dengan pendekatan *clean architecture* dan prinsip desain *Swiss Editorial* (fungsional, tipografi tegas, minim ornamen visual yang tidak perlu).
+
+### 1. Verifikasi Identitas Civitas Akademika (Zero-Trust Gatekeeper)
+- Pendaftaran akun mewajibkan validasi 14 digit NIM aktif dan bukti identitas mahasiswa (KTM/KRS).
+- Hak akses bertingkat (*Role-Based Access Control*):
+  - **Tamu / Publik**: Hanya dapat meninjau katalog barang dan zona perimeter COD.
+  - **Mahasiswa Pending**: Dapat melihat rincian barang, namun fitur listing dibatasi hingga KTM disetujui.
+  - **Mahasiswa Terverifikasi**: Akses penuh untuk memasang iklan dan melakukan transaksi.
+  - **Administrator**: Memegang otoritas penuh terhadap verifikasi identitas dan moderasi listing.
+
+### 2. Modul Geospasial & Radius Logistik Lubuk Begalung
+- **Titik Referensi Inti**: Koordinat kampus UPI YPTK Padang (`-0.9575, 100.3972`).
+- **Kalkulasi Jarak Real-Time (Formula Haversine)**: Mengukur jarak presisi antara titik kos penjual dengan perimeter kampus.
+- **Filter Radius Transaksi**:
+  - `< 0.5 KM`: Zona Jalan Kaki (Area terdekat gerbang utama).
+  - `< 1.0 KM`: Zona Inti Kampus & Pemukiman Mahasiswa.
+  - `< 2.0 KM`: Area Lubuk Begalung Raya.
+- **Pinpoint Coordinate Picker**: Penjual dapat menandai titik penjemputan barang langsung melalui peta interaktif saat membuat listing.
+
+### 3. Protokol Transaksi & Quality Control (QC)
+- **Laporan Inspeksi Fisik**: Setiap unit melewati status validasi sebelum tayang di katalog utama untuk memastikan kejujuran deskripsi.
+- **Kalkulator Biaya Transparan**:
+  - Opsi 1: *Jemput Mandiri di Titik COD Kampus* (Rp 0 ongkir).
+  - Opsi 2: *Antar Kurir Mahasiswa* (Kalkulasi otomatis berdasarkan jarak per kilometer dan beban handling barang).
+- **Format Order Otomatis ke WhatsApp**: Mengonversi rincian invoice transaksi, identitas pembeli, dan rute penjemputan menjadi format pesan WhatsApp terstruktur ke admin/penjual.
+
+### 4. Konsol Kendali Administrator (Admin CMS)
+Panel terintegrasi untuk kebutuhan operasional platform:
+- **Dashboard Telemetri**: Grafik tren kunjungan, distribusi kategori barang, dan antrean verifikasi aktif.
+- **Manajemen Inventaris**: Verifikasi, penolakan, atau penyuntingan catatan QC barang.
+- **Manajemen Pengguna & KTM**: Panel inspeksi dokumen KTM/KRS dengan fitur persetujuan dan penolakan berulang.
+- **Zona Titik Temu Resmi**: Penambahan dan pembaruan titik COD aman (misal: Perpustakaan, Halte Utama, Kantin Pusat).
+- **Pengaturan Tarif**: Penyesuaian fleksibel untuk biaya administrasi, formula ongkir, serta rekening bersama.
+
+## Struktur Direktori Proyek
+
+```
+campustrade_upi/
+├── lib/
+│   ├── config/             # Konfigurasi konstanta, tema Swiss Editorial, & rute
+│   ├── models/             # Data model (User, Product, CodSpot, Logistik)
+│   ├── modules/
+│   │   ├── admin/          # Panel konsol CMS, dashboard metrik, & manajemen user
+│   │   ├── auth/           # Formulir login, pendaftaran KTM, & validasi NIM
+│   │   ├── catalog/        # Tampilan katalog produk, filter bento grid, & detail modal
+│   │   ├── geospatial/     # Komponen peta interaktif, radar jarak, & penanda koordinat
+│   │   └── sell/           # Alur pasang iklan barang & kalkulator estimasi pendapatan
+│   ├── services/           # Logika kalkulasi Haversine, simulasi API, & state management
+│   └── main.dart           # Titik masuk utama aplikasi (Main Runner)
+├── pubspec.yaml            # Konfigurasi dependensi proyek Flutter
+└── README.md
+```
+
+## Kredensial Pengujian (Data Demo)
+
+Aplikasi telah dilengkapi basis data awal untuk simulasi alur kerja pengujian:
+
+| Peran Akun | Username | Identifikasi / NIM | Sandi | Status Akses |
 | :--- | :--- | :--- | :--- | :--- |
-| **Administrator** | `admin` | `admin` | `password` (atau `admin123`) | `approved` |
-| **Mahasiswa (Verified)** | `iqbal_m` | `24101152610172` | `password` | `approved` |
-| **Mahasiswa (Verified)** | `okta_kr` | `24101152610177` | `password` | `approved` |
-| **Mahasiswa (Verified)** | `anggara_y` | `24101152610222` | `password` | `approved` |
-| **Mahasiswa (Pending KTM)** | `fajar_pratama` | `24101152610999` | `password` | `pending` |
+| **Administrator** | `admin` | `admin` | `admin123` | Otoritas Penuh CMS |
+| **Mahasiswa 1** | `iqbal_m` | `24101152610172` | `password` | Mahasiswa Terverifikasi |
+| **Mahasiswa 2** | `okta_kr` | `24101152610177` | `password` | Mahasiswa Terverifikasi |
+| **Mahasiswa 3** | `anggara_y` | `24101152610222` | `password` | Mahasiswa Terverifikasi |
+| **Mahasiswa Baru** | `fajar_pratama` | `24101152610999` | `password` | Menunggu Validasi KTM |
 
-## Cara Menjalankan
+## Panduan Menjalankan Aplikasi
 
-1. Ekstrak folder proyek ini, lalu jalankan:
+Pastikan lingkungan pengembangan telah terpasang **Flutter SDK** (versi stable) dan dependensi platform target.
+
+1. **Unduh dependensi proyek**:
    ```bash
    flutter pub get
+   ```
+
+2. **Jalankan di perangkat yang terhubung (Desktop/Mobile)**:
+   ```bash
    flutter run
    ```
-2. Untuk menjalankan di browser (Web):
+
+3. **Jalankan pada browser (Web)**:
    ```bash
    flutter run -d chrome
    ```
