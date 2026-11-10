@@ -138,8 +138,10 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                     padding: EdgeInsets.symmetric(vertical: 16),
                     child: Divider(height: 1),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    spacing: 8,
+                    runSpacing: 4,
                     children: [
                       Text('CAMPUSTRADE // UPI YPTK',
                           style: SwissTheme.mono(

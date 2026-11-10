@@ -24,20 +24,37 @@ class AdminCmsScreen extends StatefulWidget {
 class _AdminCmsScreenState extends State<AdminCmsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String get _headerTitle {
+  String get _currentTabLabel {
     switch (widget.appState.currentAdminTab) {
       case 'products':
-        return 'Inventaris & Quality Control Unit Kos';
+        return 'Inventaris & QC Barang';
       case 'users':
-        return 'Verifikasi Identitas Mahasiswa (KTM/KRS)';
+        return 'Verifikasi KTM & User';
       case 'cod_spots':
-        return 'Manajemen Zona Titik Temu COD Resmi';
+        return 'Zona Titik COD Resmi';
       case 'settings':
-        return 'Konfigurasi Tarif Fee, Ongkir & Rekber';
+        return 'Tarif Fee & Ongkir';
       default:
-        return 'Ringkasan Telemetri & Analitik Bursa';
+        return 'Ringkasan & Trafik';
     }
   }
+
+  String get _currentTabSubtitle {
+    switch (widget.appState.currentAdminTab) {
+      case 'products':
+        return 'Manajemen Kurasi & Quality Control Unit Kos';
+      case 'users':
+        return 'Validasi Identitas Mahasiswa Kampus UPI YPTK';
+      case 'cod_spots':
+        return 'Pemetaan Titik Temu Transaksi Aman Lubuk Begalung';
+      case 'settings':
+        return 'Konfigurasi Parameter Biaya, Ongkir & Rekber';
+      default:
+        return 'Telemetri Real-Time & Analitik Ekosistem Kampus';
+    }
+  }
+
+  String get _headerTitle => _currentTabLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +64,26 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: SwissColors.surface,
-      drawer: isDesktop ? null : Drawer(child: _buildSidebar(isDrawer: true)),
+      drawer: isDesktop
+          ? null
+          : Drawer(
+              backgroundColor: SwissColors.white,
+              child: SafeArea(
+                child: _buildSidebar(isDrawer: true),
+              ),
+            ),
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isDesktop) SizedBox(width: 256, child: _buildSidebar()),
+            if (isDesktop)
+              Container(
+                width: 256,
+                decoration: const BoxDecoration(
+                  border: Border(right: BorderSide(color: SwissColors.zinc200)),
+                ),
+                child: _buildSidebar(),
+              ),
             Expanded(
               child: Column(
                 children: [
@@ -79,78 +110,89 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
     final int pendingKtm = s.countPendingUsers;
 
     return Container(
-      color: SwissColors.zinc950,
+      color: SwissColors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Brand Header
           Container(
             height: 64,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: SwissColors.zinc800)),
+              border: Border(bottom: BorderSide(color: SwissColors.zinc200)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: SwissColors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'CT',
-                        style: SwissTheme.display(
-                            size: 12, color: SwissColors.zinc950),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'CampusCMS',
-                              style: SwissTheme.display(
-                                  size: 14, color: SwissColors.white),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: SwissColors.zinc800,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                'v2.4',
-                                style: SwissTheme.mono(
-                                    size: 9, color: SwissColors.zinc300),
-                              ),
-                            ),
-                          ],
+                InkWell(
+                  onTap: () {
+                    if (isDrawer) Navigator.pop(context);
+                    s.setAdminTab('dashboard');
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: SwissColors.zinc950,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        Text(
-                          'UPI YPTK PADANG',
-                          style: SwissTheme.mono(
-                              size: 9, color: SwissColors.zinc500),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'CT',
+                          style: SwissTheme.display(
+                              size: 13, color: SwissColors.white),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'CampusTrade',
+                                style: SwissTheme.display(
+                                    size: 14, color: SwissColors.zinc950),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: SwissColors.indigo50,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border:
+                                      Border.all(color: SwissColors.indigo200),
+                                ),
+                                child: Text(
+                                  'CMS',
+                                  style: SwissTheme.mono(
+                                      size: 9,
+                                      weight: FontWeight.w700,
+                                      color: SwissColors.indigo600),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'UPI YPTK PADANG',
+                            style: SwissTheme.mono(
+                                size: 9, color: SwissColors.zinc400),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 if (isDrawer)
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close,
-                        size: 16, color: SwissColors.zinc400),
+                        size: 18, color: SwissColors.zinc500),
+                    tooltip: 'Tutup Menu',
                   ),
               ],
             ),
@@ -165,7 +207,11 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                   child: Text(
                     'KONSOL OPERASIONAL',
-                    style: SwissTheme.mono(size: 9, color: SwissColors.zinc500),
+                    style: SwissTheme.mono(
+                        size: 9,
+                        weight: FontWeight.w700,
+                        color: SwissColors.zinc400,
+                        letterSpacing: 0.5),
                   ),
                 ),
                 _sidebarItem(
@@ -202,42 +248,32 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
-                  child: Divider(color: SwissColors.zinc800, height: 1),
+                  child: Divider(color: SwissColors.zinc200, height: 1),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                   child: Text(
-                    'TAUTAN EKSTERNAL',
-                    style: SwissTheme.mono(size: 9, color: SwissColors.zinc500),
+                    'PINTASAN & SISTEM',
+                    style: SwissTheme.mono(
+                        size: 9,
+                        weight: FontWeight.w700,
+                        color: SwissColors.zinc400,
+                        letterSpacing: 0.5),
                   ),
                 ),
-                ListTile(
-                  dense: true,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  leading: const Icon(Icons.open_in_new,
-                      size: 16, color: SwissColors.emerald400),
-                  title: Text(
-                    'Buka Katalog Publik',
-                    style: SwissTheme.sans(
-                        size: 12, color: SwissColors.emerald400),
-                  ),
+                _externalLinkItem(
+                  icon: Icons.storefront_outlined,
+                  label: 'Buka Katalog Publik',
+                  color: SwissColors.zinc800,
                   onTap: () {
                     if (isDrawer) Navigator.pop(context);
                     s.navigateTo('catalog');
                   },
                 ),
-                ListTile(
-                  dense: true,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  leading: const Icon(Icons.logout,
-                      size: 16, color: SwissColors.rose400),
-                  title: Text(
-                    'Akhiri Sesi',
-                    style:
-                        SwissTheme.sans(size: 12, color: SwissColors.rose400),
-                  ),
+                _externalLinkItem(
+                  icon: Icons.logout,
+                  label: 'Akhiri Sesi Admin',
+                  color: SwissColors.rose600,
                   onTap: () {
                     if (isDrawer) Navigator.pop(context);
                     s.logout();
@@ -251,22 +287,25 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: SwissColors.zinc800)),
+              color: SwissColors.zinc50,
+              border: Border(top: BorderSide(color: SwissColors.zinc200)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     color: SwissColors.zinc900,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: SwissColors.zinc800),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     'AD',
-                    style: SwissTheme.mono(size: 11, color: SwissColors.white),
+                    style: SwissTheme.mono(
+                        size: 11,
+                        weight: FontWeight.w700,
+                        color: SwissColors.white),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -282,13 +321,34 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                         style: SwissTheme.sans(
                           size: 12,
                           weight: FontWeight.w600,
-                          color: SwissColors.white,
+                          color: SwissColors.zinc900,
                         ),
                       ),
-                      Text(
-                        '@${s.currentUser?.username ?? 'admin'}',
-                        style: SwissTheme.mono(
-                            size: 10, color: SwissColors.zinc500),
+                      Row(
+                        children: [
+                          Text(
+                            '@${s.currentUser?.username ?? 'admin'}',
+                            style: SwissTheme.mono(
+                                size: 10, color: SwissColors.zinc500),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: SwissColors.emerald50,
+                              borderRadius: BorderRadius.circular(3),
+                              border: Border.all(color: SwissColors.emerald200),
+                            ),
+                            child: Text(
+                              'ONLINE',
+                              style: SwissTheme.mono(
+                                  size: 8,
+                                  weight: FontWeight.w700,
+                                  color: SwissColors.emerald700),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -320,16 +380,15 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: active ? SwissColors.zinc800 : Colors.transparent,
+            color: active ? SwissColors.zinc950 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
-            border: active ? Border.all(color: SwissColors.zinc700) : null,
           ),
           child: Row(
             children: [
               Icon(
                 icon,
                 size: 16,
-                color: active ? SwissColors.white : SwissColors.zinc400,
+                color: active ? SwissColors.white : SwissColors.zinc500,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -338,7 +397,7 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   style: SwissTheme.sans(
                     size: 12,
                     weight: active ? FontWeight.w600 : FontWeight.w500,
-                    color: active ? SwissColors.white : SwissColors.zinc400,
+                    color: active ? SwissColors.white : SwissColors.zinc700,
                   ),
                 ),
               ),
@@ -347,15 +406,20 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: SwissColors.amber500,
+                    color:
+                        active ? SwissColors.amber400 : SwissColors.amber100,
                     borderRadius: BorderRadius.circular(4),
+                    border: active
+                        ? null
+                        : Border.all(color: SwissColors.amber300),
                   ),
                   child: Text(
                     '$badgeCount',
                     style: SwissTheme.mono(
                       size: 10,
                       weight: FontWeight.w700,
-                      color: SwissColors.zinc950,
+                      color:
+                          active ? SwissColors.zinc950 : SwissColors.amber900,
                     ),
                   ),
                 ),
@@ -366,10 +430,46 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
     );
   }
 
+  Widget _externalLinkItem({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: SwissTheme.sans(
+                    size: 12,
+                    weight: FontWeight.w500,
+                    color: color,
+                  ),
+                ),
+              ),
+              Icon(Icons.arrow_forward,
+                  size: 12, color: color.withOpacity(0.4)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAdminNavbar(bool isDesktop) {
     return Container(
       height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 20 : 12),
       decoration: const BoxDecoration(
         color: SwissColors.white,
         border: Border(bottom: BorderSide(color: SwissColors.zinc200)),
@@ -384,64 +484,113 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   IconButton(
                     onPressed: () =>
                         _scaffoldKey.currentState?.openDrawer(),
-                    icon: const Icon(Icons.menu, size: 20),
+                    icon: const Icon(Icons.menu,
+                        size: 22, color: SwissColors.zinc900),
+                    tooltip: 'Buka Menu',
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 4),
                 ],
                 Flexible(
-                  child: Text(
-                    _headerTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SwissTheme.display(size: 16),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: SwissColors.zinc100,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: SwissColors.zinc200),
-                  ),
-                  child: Text(
-                    'UPI YPTK',
-                    style:
-                        SwissTheme.mono(size: 9, color: SwissColors.zinc600),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _currentTabLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: SwissTheme.display(
+                                  size: isDesktop ? 16 : 14),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: SwissColors.zinc100,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: SwissColors.zinc200),
+                            ),
+                            child: Text(
+                              'ADMIN',
+                              style: SwissTheme.mono(
+                                  size: 9,
+                                  weight: FontWeight.w700,
+                                  color: SwissColors.indigo600),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isDesktop)
+                        Text(
+                          _currentTabSubtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SwissTheme.mono(
+                              size: 10, color: SwissColors.zinc400),
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (isDesktop) ...[
                 Text(
-                  'PADANG // WEST SUMATRA',
+                  'PADANG // UPI YPTK',
                   style: SwissTheme.mono(size: 10, color: SwissColors.zinc400),
                 ),
                 const SizedBox(width: 14),
+                ElevatedButton.icon(
+                  onPressed: () => widget.appState.navigateTo('catalog'),
+                  icon: const Icon(Icons.open_in_new, size: 13),
+                  label: Text(
+                    'Katalog Publik',
+                    style: SwissTheme.sans(
+                        size: 11,
+                        weight: FontWeight.w600,
+                        color: SwissColors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SwissColors.zinc950,
+                    foregroundColor: SwissColors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 9),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ] else ...[
+                OutlinedButton.icon(
+                  onPressed: () => widget.appState.navigateTo('catalog'),
+                  icon: const Icon(Icons.open_in_new,
+                      size: 13, color: SwissColors.zinc800),
+                  label: Text(
+                    'Katalog',
+                    style: SwissTheme.sans(
+                        size: 11,
+                        weight: FontWeight.w600,
+                        color: SwissColors.zinc800),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: SwissColors.white,
+                    side: const BorderSide(color: SwissColors.zinc200),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
               ],
-              ElevatedButton.icon(
-                onPressed: () => widget.appState.navigateTo('catalog'),
-                icon: const Icon(Icons.open_in_new, size: 13),
-                label: Text(
-                  'Katalog Publik',
-                  style: SwissTheme.sans(
-                      size: 11,
-                      weight: FontWeight.w600,
-                      color: SwissColors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SwissColors.zinc950,
-                  foregroundColor: SwissColors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
             ],
           ),
         ],
@@ -769,20 +918,25 @@ class _AdminDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ANALITIK TRAFIK',
-                    style:
-                        SwissTheme.mono(size: 10, color: SwissColors.zinc400),
-                  ),
-                  Text(
-                    'Tren Kunjungan Harian (7 Hari Terakhir)',
-                    style: SwissTheme.display(size: 15),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ANALITIK TRAFIK',
+                      style:
+                          SwissTheme.mono(size: 10, color: SwissColors.zinc400),
+                    ),
+                    Text(
+                      'Tren Kunjungan Harian (7 Hari Terakhir)',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SwissTheme.display(size: 15),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -920,20 +1074,25 @@ class _AdminDashboardView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ACTIVE SESSIONS',
-                      style: SwissTheme.mono(
-                          size: 10, color: SwissColors.emerald600),
-                    ),
-                    Text(
-                      'Pengguna Sedang Online',
-                      style: SwissTheme.display(size: 15),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ACTIVE SESSIONS',
+                        style: SwissTheme.mono(
+                            size: 10, color: SwissColors.emerald600),
+                      ),
+                      Text(
+                        'Pengguna Sedang Online',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SwissTheme.display(size: 15),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1058,20 +1217,25 @@ class _AdminDashboardView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'MODUL INVENTARIS',
-                      style:
-                          SwissTheme.mono(size: 10, color: SwissColors.zinc400),
-                    ),
-                    Text(
-                      'Listing Barang Terbaru',
-                      style: SwissTheme.display(size: 15),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'MODUL INVENTARIS',
+                        style: SwissTheme.mono(
+                            size: 10, color: SwissColors.zinc400),
+                      ),
+                      Text(
+                        'Listing Barang Terbaru',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SwissTheme.display(size: 15),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 InkWell(
                   onTap: () => appState.setAdminTab('products'),
                   child: Text(
@@ -1601,17 +1765,26 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    prod.kategori.toUpperCase(),
-                                    style: SwissTheme.mono(
-                                        size: 9,
-                                        color: SwissColors.indigo600),
+                                  Expanded(
+                                    child: Text(
+                                      prod.kategori.toUpperCase(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: SwissTheme.mono(
+                                          size: 9,
+                                          color: SwissColors.indigo600),
+                                    ),
                                   ),
+                                  const SizedBox(width: 6),
                                   _statusBadge(prod.statusVerifikasi),
                                 ],
                               ),
-                              Text(prod.namaBarang,
-                                  style: SwissTheme.display(size: 14)),
+                              Text(
+                                prod.namaBarang,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: SwissTheme.display(size: 14),
+                              ),
                               Text(
                                 SwissTheme.formatRupiah(prod.harga),
                                 style: SwissTheme.display(size: 14),
@@ -1912,11 +2085,16 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'KARTU TANDA MAHASISWA // UPI YPTK PADANG',
-                          style: SwissTheme.mono(
-                              size: 9, color: SwissColors.indigo400),
+                        Expanded(
+                          child: Text(
+                            'KARTU TANDA MAHASISWA // UPI YPTK PADANG',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: SwissTheme.mono(
+                                size: 9, color: SwissColors.indigo400),
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
@@ -2421,43 +2599,59 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
               runSpacing: 12,
               children: [
                 // Identity
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: SwissColors.zinc900,
-                        borderRadius: BorderRadius.circular(8),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: (widget.width - 64).clamp(180.0, 480.0),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: SwissColors.zinc900,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          u.initials,
+                          style:
+                              SwissTheme.mono(size: 12, color: SwissColors.white),
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        u.initials,
-                        style:
-                            SwissTheme.mono(size: 12, color: SwissColors.white),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(u.nama, style: SwissTheme.display(size: 14)),
-                            const SizedBox(width: 6),
-                            _statusBadge(u.statusVerifikasi),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    u.nama,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: SwissTheme.display(size: 14),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                _statusBadge(u.statusVerifikasi),
+                              ],
+                            ),
+                            Text(
+                              '@${u.username} • NIM: ${u.nim} • ${u.jurusan}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: SwissTheme.mono(
+                                  size: 10, color: SwissColors.zinc500),
+                            ),
                           ],
                         ),
-                        Text(
-                          '@${u.username} • NIM: ${u.nim} • ${u.jurusan}',
-                          style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc500),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
 
                 // Actions
@@ -2928,24 +3122,35 @@ class _AdminSettingsViewState extends State<_AdminSettingsView> {
               Text('Struktur Fee Jasa Verifikasi Fisik & Rekber',
                   style: SwissTheme.display(size: 15)),
               const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                      child: _dialogField(
-                          'Fee Standar (Rp)', _feeStandarCtrl,
-                          isNumber: true)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: _dialogField(
-                          'Fee Unit Kecil (Rp)', _feeKecilCtrl,
-                          isNumber: true)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: _dialogField(
-                          'Fee Unit Besar (Rp)', _feeBesarCtrl,
-                          isNumber: true)),
-                ],
-              ),
+              if (widget.width < 600) ...[
+                _dialogField('Fee Standar (Rp)', _feeStandarCtrl,
+                    isNumber: true),
+                const SizedBox(height: 10),
+                _dialogField('Fee Unit Kecil (Rp)', _feeKecilCtrl,
+                    isNumber: true),
+                const SizedBox(height: 10),
+                _dialogField('Fee Unit Besar (Rp)', _feeBesarCtrl,
+                    isNumber: true),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                        child: _dialogField(
+                            'Fee Standar (Rp)', _feeStandarCtrl,
+                            isNumber: true)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _dialogField(
+                            'Fee Unit Kecil (Rp)', _feeKecilCtrl,
+                            isNumber: true)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _dialogField(
+                            'Fee Unit Besar (Rp)', _feeBesarCtrl,
+                            isNumber: true)),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -2967,31 +3172,44 @@ class _AdminSettingsViewState extends State<_AdminSettingsView> {
               Text('Tarif Ekspedisi & Kurir Antar-Kos Admin',
                   style: SwissTheme.display(size: 15)),
               const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                      child: _dialogField(
-                          'Ongkir Dasar (Rp)', _ongkirDasarCtrl,
-                          isNumber: true)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: _dialogField('Tarif per KM (Rp)', _ongkirKmCtrl,
-                          isNumber: true)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                      child: _dialogField(
-                          'Handling Berat (Rp)', _handlingBeratCtrl,
-                          isNumber: true)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child:
-                          _dialogField('Max Radius (KM)', _maxRadiusCtrl)),
-                ],
-              ),
+              if (widget.width < 600) ...[
+                _dialogField('Ongkir Dasar (Rp)', _ongkirDasarCtrl,
+                    isNumber: true),
+                const SizedBox(height: 10),
+                _dialogField('Tarif per KM (Rp)', _ongkirKmCtrl,
+                    isNumber: true),
+                const SizedBox(height: 10),
+                _dialogField('Handling Berat (Rp)', _handlingBeratCtrl,
+                    isNumber: true),
+                const SizedBox(height: 10),
+                _dialogField('Max Radius (KM)', _maxRadiusCtrl),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                        child: _dialogField(
+                            'Ongkir Dasar (Rp)', _ongkirDasarCtrl,
+                            isNumber: true)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _dialogField('Tarif per KM (Rp)', _ongkirKmCtrl,
+                            isNumber: true)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                        child: _dialogField(
+                            'Handling Berat (Rp)', _handlingBeratCtrl,
+                            isNumber: true)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child:
+                            _dialogField('Max Radius (KM)', _maxRadiusCtrl)),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -3018,15 +3236,21 @@ class _AdminSettingsViewState extends State<_AdminSettingsView> {
               const SizedBox(height: 14),
               _dialogField('Bank / E-Wallet *', _bankCtrl),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                      child: _dialogField('Nomor Rekening *', _rekCtrl)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: _dialogField('Atas Nama *', _atasNamaCtrl)),
-                ],
-              ),
+              if (widget.width < 600) ...[
+                _dialogField('Nomor Rekening *', _rekCtrl),
+                const SizedBox(height: 10),
+                _dialogField('Atas Nama *', _atasNamaCtrl),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                        child: _dialogField('Nomor Rekening *', _rekCtrl)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _dialogField('Atas Nama *', _atasNamaCtrl)),
+                  ],
+                ),
+              ],
               const SizedBox(height: 10),
               _dialogField('No. WhatsApp Admin Verifikator *', _waAdminCtrl),
               const SizedBox(height: 10),
@@ -3044,39 +3268,68 @@ class _AdminSettingsViewState extends State<_AdminSettingsView> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: SwissColors.zinc200),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: widget.width < 500
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text('Terapkan Parameter Sistem',
                         style: SwissTheme.display(size: 13)),
                     Text('Sinkronisasi instan ke seluruh transaksi baru.',
                         style: SwissTheme.sans(
                             size: 11, color: SwissColors.zinc500)),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: _saveSettings,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: SwissColors.zinc950,
+                        foregroundColor: SwissColors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: Text('Simpan Konfigurasi',
+                          style: SwissTheme.sans(
+                              size: 12,
+                              weight: FontWeight.w600,
+                              color: SwissColors.white)),
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Terapkan Parameter Sistem',
+                              style: SwissTheme.display(size: 13)),
+                          Text('Sinkronisasi instan ke seluruh transaksi baru.',
+                              style: SwissTheme.sans(
+                                  size: 11, color: SwissColors.zinc500)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: _saveSettings,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: SwissColors.zinc950,
+                        foregroundColor: SwissColors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: Text('Simpan Konfigurasi',
+                          style: SwissTheme.sans(
+                              size: 12,
+                              weight: FontWeight.w600,
+                              color: SwissColors.white)),
+                    ),
                   ],
                 ),
-              ),
-              ElevatedButton(
-                onPressed: _saveSettings,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SwissColors.zinc950,
-                  foregroundColor: SwissColors.white,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Text('Simpan Konfigurasi',
-                    style: SwissTheme.sans(
-                        size: 12,
-                        weight: FontWeight.w600,
-                        color: SwissColors.white)),
-              ),
-            ],
-          ),
         ),
       ],
     );

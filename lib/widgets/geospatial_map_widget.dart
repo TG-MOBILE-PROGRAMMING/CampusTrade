@@ -243,7 +243,9 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                     border: Border.all(color: SwissColors.zinc200),
                   ),
                   child: Text(
-                    'UPI YPTK LUBEG (-0.9575, 100.3972)',
+                    constraints.maxWidth < 360
+                        ? 'UPI YPTK LUBEG'
+                        : 'UPI YPTK LUBEG (-0.9575, 100.3972)',
                     style: SwissTheme.mono(
                       size: 9,
                       weight: FontWeight.w600,
@@ -479,9 +481,12 @@ class DetailRouteMiniMap extends StatelessWidget {
           ),
           // Seller Kos Pin
           Positioned(
-            left: 28,
+            left: 20,
             top: 36,
             child: Container(
+              constraints: BoxConstraints(
+                maxWidth: (MediaQuery.of(context).size.width * 0.6).clamp(140.0, 260.0),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: SwissColors.rose600,
@@ -496,6 +501,8 @@ class DetailRouteMiniMap extends StatelessWidget {
               ),
               child: Text(
                 '🏠 Kos: ${product.lokasiKos}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: SwissTheme.sans(
                   size: 10,
                   weight: FontWeight.w700,
@@ -506,9 +513,12 @@ class DetailRouteMiniMap extends StatelessWidget {
           ),
           // COD Spot Pin
           Positioned(
-            right: 24,
+            right: 20,
             bottom: 32,
             child: Container(
+              constraints: BoxConstraints(
+                maxWidth: (MediaQuery.of(context).size.width * 0.6).clamp(140.0, 260.0),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: SwissColors.indigo700,
@@ -523,6 +533,8 @@ class DetailRouteMiniMap extends StatelessWidget {
               ),
               child: Text(
                 '🏛️ COD: ${product.titikCod}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: SwissTheme.sans(
                   size: 10,
                   weight: FontWeight.w700,
@@ -625,8 +637,11 @@ class PinpointPickerMap extends StatelessWidget {
                 Positioned(
                   bottom: 4,
                   left: 8,
+                  right: 8,
                   child: Text(
                     'Ketuk atau geser pin untuk menyematkan koordinat kos',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: SwissTheme.mono(size: 8, color: SwissColors.zinc600),
                   ),
                 ),
