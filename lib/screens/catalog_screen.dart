@@ -237,63 +237,81 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Brand Identity
-                  InkWell(
-                    onTap: () => widget.appState.resetAllFilters(),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: SwissColors.zinc950,
-                            borderRadius: BorderRadius.circular(8),
+                  Flexible(
+                    child: InkWell(
+                      onTap: () => widget.appState.resetAllFilters(),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: SwissColors.zinc950,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'CT',
+                              style: SwissTheme.display(
+                                  size: 14, color: SwissColors.white),
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'CT',
-                            style: SwissTheme.display(
-                                size: 14, color: SwissColors.white),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                          const SizedBox(width: 10),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'CampusTrade',
-                                  style: SwissTheme.display(size: 16),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        'CampusTrade',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: SwissTheme.display(
+                                            size: isDesktop ? 16 : 15),
+                                      ),
+                                    ),
+                                    if (isDesktop) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: SwissColors.zinc100,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          border: Border.all(
+                                              color: SwissColors.zinc200),
+                                        ),
+                                        child: Text(
+                                          'UPI YPTK',
+                                          style: SwissTheme.mono(
+                                              size: 9,
+                                              color: SwissColors.zinc700),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: SwissColors.zinc100,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border:
-                                        Border.all(color: SwissColors.zinc200),
-                                  ),
-                                  child: Text(
-                                    'UPI YPTK',
+                                if (isDesktop)
+                                  Text(
+                                    'LUBUK BEGALUNG • PADANG',
                                     style: SwissTheme.mono(
-                                        size: 9, color: SwissColors.zinc700),
+                                        size: 9, color: SwissColors.zinc400),
                                   ),
-                                ),
                               ],
                             ),
-                            Text(
-                              'LUBUK BEGALUNG • PADANG',
-                              style: SwissTheme.mono(
-                                  size: 9, color: SwissColors.zinc400),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
+                  const SizedBox(width: 8),
 
                   // Search Bar (Desktop)
                   if (isDesktop)
@@ -312,46 +330,59 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isAdmin) ...[
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              widget.appState.navigateTo('admin'),
-                          icon: Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: SwissColors.indigo600,
-                              shape: BoxShape.circle,
+                        if (isDesktop)
+                          OutlinedButton.icon(
+                            onPressed: () =>
+                                widget.appState.navigateTo('admin'),
+                            icon: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: SwissColors.indigo600,
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          label: Text(
-                            'Admin CMS',
-                            style: SwissTheme.sans(
-                                size: 12,
-                                weight: FontWeight.w600,
-                                color: SwissColors.zinc900),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: SwissColors.zinc100,
-                            side: const BorderSide(color: SwissColors.zinc300),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                            label: Text(
+                              'Admin CMS',
+                              style: SwissTheme.sans(
+                                  size: 12,
+                                  weight: FontWeight.w600,
+                                  color: SwissColors.zinc900),
                             ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: SwissColors.zinc100,
+                              side: const BorderSide(
+                                  color: SwissColors.zinc300),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          )
+                        else
+                          IconButton(
+                            onPressed: () =>
+                                widget.appState.navigateTo('admin'),
+                            tooltip: 'Admin CMS',
+                            icon: const Icon(Icons.shield_outlined,
+                                size: 18, color: SwissColors.indigo600),
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.all(6),
                           ),
-                        ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                       ],
 
                       // Sell Button with Verification Gatekeeper
-                      _buildSellButton(user),
-                      const SizedBox(width: 8),
+                      _buildSellButton(user, isDesktop: isDesktop),
+                      const SizedBox(width: 6),
 
                       // User Profile or Login Button
                       if (user != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: isDesktop ? 10 : 8,
+                              vertical: isDesktop ? 4 : 2),
                           decoration: BoxDecoration(
                             color: SwissColors.zinc50,
                             borderRadius: BorderRadius.circular(8),
@@ -362,13 +393,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       ConstrainedBox(
-                                        constraints:
-                                            const BoxConstraints(maxWidth: 110),
+                                        constraints: BoxConstraints(
+                                            maxWidth: isDesktop ? 110 : 65),
                                         child: Text(
                                           user.nama,
                                           maxLines: 1,
@@ -379,47 +411,51 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               color: SwissColors.zinc900),
                                         ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 1),
-                                        decoration: BoxDecoration(
-                                          color: user.statusVerifikasi ==
-                                                  'approved'
-                                              ? SwissColors.emerald50
-                                              : SwissColors.amber50,
-                                          borderRadius:
-                                              BorderRadius.circular(3),
-                                          border: Border.all(
+                                      if (isDesktop) ...[
+                                        const SizedBox(width: 4),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 1),
+                                          decoration: BoxDecoration(
                                             color: user.statusVerifikasi ==
                                                     'approved'
-                                                ? SwissColors.emerald200
-                                                : SwissColors.amber200,
+                                                ? SwissColors.emerald50
+                                                : SwissColors.amber50,
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                            border: Border.all(
+                                              color: user.statusVerifikasi ==
+                                                      'approved'
+                                                  ? SwissColors.emerald200
+                                                  : SwissColors.amber200,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            user.statusVerifikasi == 'approved'
+                                                ? 'VERIFIED'
+                                                : 'PENDING',
+                                            style: SwissTheme.mono(
+                                              size: 8,
+                                              color: user.statusVerifikasi ==
+                                                      'approved'
+                                                  ? SwissColors.emerald700
+                                                  : SwissColors.amber800,
+                                            ),
                                           ),
                                         ),
-                                        child: Text(
-                                          user.statusVerifikasi == 'approved'
-                                              ? 'VERIFIED'
-                                              : 'PENDING',
-                                          style: SwissTheme.mono(
-                                            size: 8,
-                                            color: user.statusVerifikasi ==
-                                                    'approved'
-                                                ? SwissColors.emerald700
-                                                : SwissColors.amber800,
-                                          ),
-                                        ),
-                                      ),
+                                      ],
                                     ],
                                   ),
-                                  Text(
-                                    '@${user.username}',
-                                    style: SwissTheme.mono(
-                                        size: 9, color: SwissColors.zinc500),
-                                  ),
+                                  if (isDesktop)
+                                    Text(
+                                      '@${user.username}',
+                                      style: SwissTheme.mono(
+                                          size: 9,
+                                          color: SwissColors.zinc500),
+                                    ),
                                 ],
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 4),
                               IconButton(
                                 onPressed: () => widget.appState.logout(),
                                 icon: const Icon(Icons.logout,
@@ -451,21 +487,26 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 backgroundColor: SwissColors.white,
                                 side: const BorderSide(
                                     color: SwissColors.zinc200),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: isDesktop ? 12 : 8,
+                                    vertical: isDesktop ? 10 : 8),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            IconButton(
-                              onPressed: () =>
-                                  widget.appState.navigateTo('admin'),
-                              tooltip: 'Buka Demo Admin CMS',
-                              icon: const Icon(Icons.admin_panel_settings_outlined,
-                                  size: 18, color: SwissColors.indigo600),
-                            ),
+                            if (isDesktop) ...[
+                              const SizedBox(width: 6),
+                              IconButton(
+                                onPressed: () =>
+                                    widget.appState.navigateTo('admin'),
+                                tooltip: 'Buka Demo Admin CMS',
+                                icon: const Icon(
+                                    Icons.admin_panel_settings_outlined,
+                                    size: 18,
+                                    color: SwissColors.indigo600),
+                              ),
+                            ],
                           ],
                         ),
                     ],
@@ -485,7 +526,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  Widget _buildSellButton(UserModel? user) {
+  Widget _buildSellButton(UserModel? user, {bool isDesktop = true}) {
     if (user != null && user.statusVerifikasi == 'pending') {
       return OutlinedButton.icon(
         onPressed: _handleSellAction,
@@ -498,7 +539,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ),
         ),
         label: Text(
-          'Menunggu KTM',
+          isDesktop ? 'Menunggu KTM' : 'Pending',
           style: SwissTheme.sans(
               size: 12,
               weight: FontWeight.w600,
@@ -507,7 +548,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
         style: OutlinedButton.styleFrom(
           backgroundColor: SwissColors.amber50,
           side: const BorderSide(color: SwissColors.amber300),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 12 : 8, vertical: isDesktop ? 10 : 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
@@ -519,11 +561,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
         style: OutlinedButton.styleFrom(
           backgroundColor: SwissColors.rose50,
           side: const BorderSide(color: SwissColors.rose200),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 12 : 8, vertical: isDesktop ? 10 : 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(
-          'KTM Ditolak',
+          isDesktop ? 'KTM Ditolak' : 'Ditolak',
           style: SwissTheme.sans(
               size: 12, weight: FontWeight.w600, color: SwissColors.rose700),
         ),
@@ -534,14 +577,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
       onPressed: _handleSellAction,
       icon: const Icon(Icons.add, size: 15),
       label: Text(
-        'Jual Barang',
+        isDesktop ? 'Jual Barang' : 'Jual',
         style: SwissTheme.sans(
             size: 12, weight: FontWeight.w600, color: SwissColors.white),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: SwissColors.zinc950,
         foregroundColor: SwissColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 14 : 10, vertical: isDesktop ? 10 : 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
@@ -900,20 +944,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'TELEMETRI BURSA',
-                        style: SwissTheme.mono(
-                            size: 10, color: SwissColors.zinc400),
-                      ),
-                      Text(
-                        'Parameter Keamanan Transaksi',
-                        style: SwissTheme.display(size: 14),
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TELEMETRI BURSA',
+                          style: SwissTheme.mono(
+                              size: 10, color: SwissColors.zinc400),
+                        ),
+                        Text(
+                          'Parameter Keamanan Transaksi',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SwissTheme.display(size: 14),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1076,11 +1125,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: SwissTheme.mono(size: 9, color: SwissColors.zinc400)),
           const SizedBox(height: 2),
           Text(value,
               style: SwissTheme.display(size: 20, color: valueColor)),
           Text(sub,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: SwissTheme.sans(size: 10, color: SwissColors.zinc500)),
         ],
       ),
@@ -1471,7 +1524,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 18,
                     mainAxisSpacing: 18,
-                    mainAxisExtent: 392,
+                    mainAxisExtent: screenWidth < 520 ? 435 : 425,
                   ),
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
@@ -1512,7 +1565,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           GestureDetector(
             onTap: () => showProductDetailModal(context, s, prod),
             child: SizedBox(
-              height: 185,
+              height: 170,
               width: double.infinity,
               child: Stack(
                 fit: StackFit.expand,
@@ -1610,7 +1663,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           // Card Body
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1673,9 +1726,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: SwissTheme.sans(
-                          size: 12,
+                          size: 11,
                           color: SwissColors.zinc500,
-                          height: 1.4,
+                          height: 1.35,
                         ),
                       ),
                     ],
@@ -1684,28 +1737,30 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   // Price & Action Footer
                   Column(
                     children: [
-                      const Divider(height: 16),
+                      const Divider(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                SwissTheme.formatRupiah(
-                                    prod.effectiveOriginalPrice),
-                                style: SwissTheme.mono(
-                                  size: 10,
-                                  color: SwissColors.zinc400,
-                                  decoration: TextDecoration.lineThrough,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  SwissTheme.formatRupiah(
+                                      prod.effectiveOriginalPrice),
+                                  style: SwissTheme.mono(
+                                    size: 10,
+                                    color: SwissColors.zinc400,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                SwissTheme.formatRupiah(prod.harga),
-                                style: SwissTheme.display(size: 17),
-                              ),
-                            ],
+                                Text(
+                                  SwissTheme.formatRupiah(prod.harga),
+                                  style: SwissTheme.display(size: 17),
+                                ),
+                              ],
+                            ),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -1727,7 +1782,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -1864,7 +1919,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     crossAxisCount: cols,
                     crossAxisSpacing: 14,
                     mainAxisSpacing: 14,
-                    mainAxisExtent: 126,
+                    mainAxisExtent: screenWidth < 400 ? 138 : 126,
                   ),
                   itemCount: activeSpots.length,
                   itemBuilder: (ctx, i) {

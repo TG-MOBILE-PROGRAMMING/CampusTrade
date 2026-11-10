@@ -98,36 +98,42 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
           ],
         ),
         content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Pesan transaksi otomatis telah disalin ke Clipboard & siap diteruskan ke WhatsApp Admin ($adminPhone):',
-                style: SwissTheme.sans(size: 11, color: SwissColors.zinc600),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: SwissColors.zinc50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: SwissColors.zinc200),
+          constraints: BoxConstraints(
+            maxWidth: 440,
+            maxHeight: MediaQuery.of(context).size.height * 0.55,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pesan transaksi otomatis telah disalin ke Clipboard & siap diteruskan ke WhatsApp Admin ($adminPhone):',
+                  style: SwissTheme.sans(size: 11, color: SwissColors.zinc600),
                 ),
-                child: SelectableText(
-                  messageText,
-                  style: SwissTheme.mono(size: 10, color: SwissColors.zinc800),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: SwissColors.zinc50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: SwissColors.zinc200),
+                  ),
+                  child: SelectableText(
+                    messageText,
+                    style:
+                        SwissTheme.mono(size: 10, color: SwissColors.zinc800),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              SelectableText(
-                waUrl,
-                maxLines: 2,
-                style: SwissTheme.mono(size: 9, color: SwissColors.indigo600),
-              ),
-            ],
+                const SizedBox(height: 8),
+                SelectableText(
+                  waUrl,
+                  maxLines: 2,
+                  style: SwissTheme.mono(size: 9, color: SwissColors.indigo600),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -145,6 +151,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
     final ProductModel p = widget.product;
     final double dist = p.distanceToCampusKm;
     final int travelMins = (dist * 10).round().clamp(2, 45);
+    final double maxDialogHeight = MediaQuery.of(context).size.height * 0.88;
 
     return Dialog(
       backgroundColor: SwissColors.white,
@@ -154,7 +161,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
         side: const BorderSide(color: SwissColors.zinc200),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 672, maxHeight: 760),
+        constraints: BoxConstraints(maxWidth: 672, maxHeight: maxDialogHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -399,8 +406,11 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                     const SizedBox(height: 20),
 
                     // Section 2: Geospatial Route Map
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         Text(
                           'PETA LOKASI KOS & RUTE TITIK COD',
@@ -408,7 +418,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                               size: 10, color: SwissColors.zinc500),
                         ),
                         Text(
-                          '📍 Jarak: $dist km ($travelMins menit jalan/motor)',
+                          '📍 Jarak: $dist km ($travelMins mnt)',
                           style: SwissTheme.mono(
                               size: 10, color: SwissColors.indigo600),
                         ),
@@ -433,14 +443,19 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'LAPORAN INSPEKSI FISIK (QC ADMIN)',
-                                style: SwissTheme.mono(
-                                  size: 10,
-                                  weight: FontWeight.w700,
-                                  color: SwissColors.emerald800,
+                              Expanded(
+                                child: Text(
+                                  'LAPORAN INSPEKSI FISIK (QC ADMIN)',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: SwissTheme.mono(
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.emerald800,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 'VERIFIED',
                                 style: SwissTheme.mono(
@@ -582,10 +597,15 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Total Estimasi Transaksi',
-                                      style: SwissTheme.display(size: 13),
+                                    Expanded(
+                                      child: Text(
+                                        'Total Estimasi Transaksi',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: SwissTheme.display(size: 13),
+                                      ),
                                     ),
+                                    const SizedBox(width: 8),
                                     Text(
                                       SwissTheme.formatRupiah(_total),
                                       style: SwissTheme.display(
@@ -608,23 +628,40 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
 
             // Modal Footer (Sticky CTA)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
                 color: SwissColors.white,
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(12)),
                 border: Border(top: BorderSide(color: SwissColors.zinc200)),
               ),
-              child: Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 10,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'ESCROW PROTECTION // DANA DITERUSKAN SETELAH CEK FISIK',
-                    style: SwissTheme.mono(size: 10, color: SwissColors.zinc500),
+                  Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: SwissColors.emerald500,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'ESCROW // DANA DITERUSKAN SETELAH CEK FISIK',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SwissTheme.mono(
+                              size: 9, color: SwissColors.zinc500),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: _triggerWhatsAppOrder,
                     icon: const Icon(Icons.arrow_forward, size: 15),
@@ -640,7 +677,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                       backgroundColor: SwissColors.zinc950,
                       foregroundColor: SwissColors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 12),
+                          horizontal: 16, vertical: 11),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -669,10 +706,12 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             ),
           ),
           const SizedBox(width: 8),
-          Flexible(
+          Expanded(
             child: Text(
               value,
               textAlign: TextAlign.right,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: SwissTheme.sans(
                 size: 12,
                 weight: highlight ? FontWeight.w700 : FontWeight.w600,
@@ -746,15 +785,18 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
   Widget _invoiceRow(String label, String value, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Flexible(
+        Expanded(
           child: Text(
             label,
             style: SwissTheme.sans(size: 12, color: SwissColors.zinc600),
           ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
+          textAlign: TextAlign.right,
           style: SwissTheme.mono(
             size: 11,
             weight: FontWeight.w600,
@@ -871,6 +913,8 @@ class _SellProductDialogState extends State<_SellProductDialog> {
   @override
   Widget build(BuildContext context) {
     final activeSpots = widget.appState.activeCodSpots;
+    final double maxDialogHeight = MediaQuery.of(context).size.height * 0.88;
+
     return Dialog(
       backgroundColor: SwissColors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
@@ -879,7 +923,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
         side: const BorderSide(color: SwissColors.zinc200),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 580, maxHeight: 760),
+        constraints: BoxConstraints(maxWidth: 580, maxHeight: maxDialogHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1022,8 +1066,10 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: SwissColors.zinc200),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1041,7 +1087,7 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                               ],
                             ),
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'ESTIMASI BERSIH DITERIMA',
@@ -1389,6 +1435,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         : _tab == 'register'
             ? 'Daftar Akun Mahasiswa Baru'
             : 'Pemulihan Kata Sandi';
+    final double maxDialogHeight = MediaQuery.of(context).size.height * 0.88;
 
     return Dialog(
       backgroundColor: SwissColors.white,
@@ -1398,7 +1445,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         side: const BorderSide(color: SwissColors.zinc200),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 450, maxHeight: 740),
+        constraints: BoxConstraints(maxWidth: 450, maxHeight: maxDialogHeight),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -1523,6 +1570,8 @@ class _AuthDialogState extends State<_AuthDialog> {
           ),
           child: Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: SwissTheme.sans(
               size: 11,
               weight: active ? FontWeight.w700 : FontWeight.w600,
