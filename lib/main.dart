@@ -11,29 +11,27 @@ void main() {
 }
 
 class CampusTradeApp extends StatefulWidget {
-  const CampusTradeApp({super.key});
+  final CampusTradeState? appState;
+  const CampusTradeApp({super.key, this.appState});
 
   @override
   State<CampusTradeApp> createState() => _CampusTradeAppState();
 }
 
 class _CampusTradeAppState extends State<CampusTradeApp> {
-  final CampusTradeState _appState = CampusTradeState();
-  bool _showPreloader = true;
+  late final CampusTradeState _appState;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 450), () {
-      if (mounted) {
-        setState(() => _showPreloader = false);
-      }
-    });
+    _appState = widget.appState ?? CampusTradeState();
   }
 
   @override
   void dispose() {
-    _appState.dispose();
+    if (widget.appState == null) {
+      _appState.dispose();
+    }
     super.dispose();
   }
 
@@ -45,14 +43,7 @@ class _CampusTradeAppState extends State<CampusTradeApp> {
       theme: SwissTheme.lightTheme,
       home: AnimatedBuilder(
         animation: _appState,
-        builder: (context, _) {
-          return Stack(
-            children: [
-              _buildCurrentRoute(),
-              if (_showPreloader) _buildEditorialPreloader(),
-            ],
-          );
-        },
+        builder: (context, _) => _buildCurrentRoute(),
       ),
     );
   }
@@ -66,69 +57,5 @@ class _CampusTradeAppState extends State<CampusTradeApp> {
       default:
         return CatalogScreen(appState: _appState);
     }
-  }
-
-  Widget _buildEditorialPreloader() {
-    return Material(
-      color: const Color(0xCCFFFFFF),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: SwissColors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: SwissColors.zinc200),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1409090B),
-                blurRadius: 24,
-                offset: Offset(0, 8),
-              )
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 34,
-                height: 34,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const CircularProgressIndicator(
-                      strokeWidth: 2.2,
-                      color: SwissColors.zinc950,
-                    ),
-                    Text('CT', style: SwissTheme.display(size: 11)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 14),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text('CAMPUSTRADE', style: SwissTheme.display(size: 12)),
-                      const SizedBox(width: 6),
-                      Text('v2.4',
-                          style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc400)),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'UPI YPTK PADANG // LUBUK BEGALUNG',
-                    style:
-                        SwissTheme.mono(size: 10, color: SwissColors.zinc500),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
