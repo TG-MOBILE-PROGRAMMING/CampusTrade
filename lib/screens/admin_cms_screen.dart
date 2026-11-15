@@ -3181,25 +3181,114 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
                 color: isActive ? SwissColors.adminHairline : const Color(0xFF1E212E),
               ),
             ),
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 14,
-              runSpacing: 10,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: widget.width >= 640
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(spot.namaTitik,
+                                    style: SwissTheme.display(
+                                      size: 14,
+                                      color: SwissColors.adminTextHigh,
+                                    )),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: SwissColors.adminElevated,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                        color: SwissColors.adminHairline),
+                                  ),
+                                  child: Text(spot.categoryTag,
+                                      style: SwissTheme.mono(
+                                          size: 9,
+                                          color: SwissColors.linearLavender)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(spot.deskripsi,
+                                style: SwissTheme.sans(
+                                    size: 12, color: SwissColors.adminTextLow)),
+                            const SizedBox(height: 4),
+                            Text(
+                              'GPS: ${spot.latitude.toStringAsFixed(4)}, ${spot.longitude.toStringAsFixed(4)}',
+                              style: SwissTheme.mono(
+                                  size: 10, color: SwissColors.adminTextLow),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 14),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(spot.namaTitik,
-                              style: SwissTheme.display(
-                                size: 14,
-                                color: SwissColors.adminTextHigh,
-                              )),
+                          InkWell(
+                            onTap: () => s.toggleCodSpotStatus(spot.id),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? const Color(0x1F059669)
+                                    : SwissColors.adminElevated,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isActive
+                                      ? const Color(0x33059669)
+                                      : SwissColors.adminHairline,
+                                ),
+                              ),
+                              child: Text(
+                                '● ${spot.status.toUpperCase()}',
+                                style: SwissTheme.mono(
+                                  size: 10,
+                                  weight: FontWeight.w700,
+                                  color: isActive
+                                      ? SwissColors.verifiedEmerald
+                                      : SwissColors.adminTextLow,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: () => _openSpotDialog(existing: spot),
+                            child: _actionChip('EDIT',
+                                bg: SwissColors.adminElevated,
+                                fg: SwissColors.adminTextHigh),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: () => s.deleteCodSpot(spot.id),
+                            child: _actionChip('DEL',
+                                bg: SwissColors.adminElevated,
+                                fg: SwissColors.dangerRose),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(spot.namaTitik,
+                                style: SwissTheme.display(
+                                  size: 14,
+                                  color: SwissColors.adminTextHigh,
+                                )),
+                          ),
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -3207,11 +3296,13 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
                             decoration: BoxDecoration(
                               color: SwissColors.adminElevated,
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: SwissColors.adminHairline),
+                              border: Border.all(
+                                  color: SwissColors.adminHairline),
                             ),
                             child: Text(spot.categoryTag,
                                 style: SwissTheme.mono(
-                                    size: 9, color: SwissColors.linearLavender)),
+                                    size: 9,
+                                    color: SwissColors.linearLavender)),
                           ),
                         ],
                       ),
@@ -3225,57 +3316,55 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
                         style: SwissTheme.mono(
                             size: 10, color: SwissColors.adminTextLow),
                       ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () => s.toggleCodSpotStatus(spot.id),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? const Color(0x1F059669)
+                                    : SwissColors.adminElevated,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isActive
+                                      ? const Color(0x33059669)
+                                      : SwissColors.adminHairline,
+                                ),
+                              ),
+                              child: Text(
+                                '● ${spot.status.toUpperCase()}',
+                                style: SwissTheme.mono(
+                                  size: 10,
+                                  weight: FontWeight.w700,
+                                  color: isActive
+                                      ? SwissColors.verifiedEmerald
+                                      : SwissColors.adminTextLow,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          InkWell(
+                            onTap: () => _openSpotDialog(existing: spot),
+                            child: _actionChip('EDIT',
+                                bg: SwissColors.adminElevated,
+                                fg: SwissColors.adminTextHigh),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: () => s.deleteCodSpot(spot.id),
+                            child: _actionChip('DEL',
+                                bg: SwissColors.adminElevated,
+                                fg: SwissColors.dangerRose),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-                Wrap(
-                  spacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () => s.toggleCodSpotStatus(spot.id),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? const Color(0x1F059669)
-                              : SwissColors.adminElevated,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: isActive
-                                ? const Color(0x33059669)
-                                : SwissColors.adminHairline,
-                          ),
-                        ),
-                        child: Text(
-                          '● ${spot.status.toUpperCase()}',
-                          style: SwissTheme.mono(
-                            size: 10,
-                            weight: FontWeight.w700,
-                            color: isActive
-                                ? SwissColors.verifiedEmerald
-                                : SwissColors.adminTextLow,
-                          ),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => _openSpotDialog(existing: spot),
-                      child: _actionChip('EDIT',
-                          bg: SwissColors.adminElevated,
-                          fg: SwissColors.adminTextHigh),
-                    ),
-                    InkWell(
-                      onTap: () => s.deleteCodSpot(spot.id),
-                      child: _actionChip('DEL',
-                          bg: SwissColors.adminElevated,
-                          fg: SwissColors.dangerRose),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           );
         }),
       ],
