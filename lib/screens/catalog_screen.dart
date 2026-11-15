@@ -2071,56 +2071,106 @@ class _CatalogScreenState extends State<CatalogScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.end,
-                  spacing: 12,
-                  runSpacing: 10,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'INFRASTRUKTUR LOGISTIK',
-                          style: SwissTheme.mono(
-                            size: 10,
-                            weight: FontWeight.w700,
-                            color: SwissColors.escrowIndigo,
+                screenWidth >= 640
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'INFRASTRUKTUR LOGISTIK',
+                                  style: SwissTheme.mono(
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.escrowIndigo,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Titik Temu COD Resmi Terverifikasi',
+                                  style: SwissTheme.display(
+                                      size: 19, color: SwissColors.inkPrimary),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Dikelola secara dinamis oleh Administrator. Apabila otoritas kampus membatasi akses di area akademik, titik dialihkan ke perimeter publik.',
+                                  style: SwissTheme.sans(
+                                      size: 12, color: SwissColors.inkSecondary),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Titik Temu COD Resmi Terverifikasi',
-                          style: SwissTheme.display(
-                              size: 19, color: SwissColors.inkPrimary),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Dikelola secara dinamis oleh Administrator. Apabila otoritas kampus membatasi akses di area akademik, titik dialihkan ke perimeter publik.',
-                          style: SwissTheme.sans(
-                              size: 12, color: SwissColors.inkSecondary),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: const Color(0xFFA7F3D0)),
+                          const SizedBox(width: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: const Color(0xFFA7F3D0)),
+                            ),
+                            child: Text(
+                              '${activeSpots.length} ZONA AKTIF',
+                              style: SwissTheme.mono(
+                                size: 10,
+                                weight: FontWeight.w700,
+                                color: SwissColors.verifiedEmerald,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'INFRASTRUKTUR LOGISTIK',
+                                style: SwissTheme.mono(
+                                  size: 10,
+                                  weight: FontWeight.w700,
+                                  color: SwissColors.escrowIndigo,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFECFDF5),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                      color: const Color(0xFFA7F3D0)),
+                                ),
+                                child: Text(
+                                  '${activeSpots.length} ZONA AKTIF',
+                                  style: SwissTheme.mono(
+                                    size: 9.5,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.verifiedEmerald,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Titik Temu COD Resmi Terverifikasi',
+                            style: SwissTheme.display(
+                                size: 18, color: SwissColors.inkPrimary),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Dikelola secara dinamis oleh Administrator. Apabila otoritas kampus membatasi akses di area akademik, titik dialihkan ke perimeter publik.',
+                            style: SwissTheme.sans(
+                                size: 11.5, color: SwissColors.inkSecondary),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        '${activeSpots.length} ZONA AKTIF',
-                        style: SwissTheme.mono(
-                          size: 10,
-                          weight: FontWeight.w700,
-                          color: SwissColors.verifiedEmerald,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Divider(height: 1, color: SwissColors.borderHairline),
@@ -2130,61 +2180,73 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   spacing: 14,
                   runSpacing: 14,
                   children: activeSpots.map((spot) {
-                    return Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: SwissColors.canvasWarm,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: SwissColors.borderHairline),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: SwissColors.canvasPure,
-                                  borderRadius: BorderRadius.circular(999),
-                                  border:
-                                      Border.all(color: SwissColors.borderHairline),
+                    return SizedBox(
+                      height: 126,
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: SwissColors.canvasWarm,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: SwissColors.borderHairline),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: SwissColors.canvasPure,
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(
+                                          color: SwissColors.borderHairline),
+                                    ),
+                                    child: Text(
+                                      spot.categoryTag,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: SwissTheme.mono(
+                                          size: 9,
+                                          weight: FontWeight.w700,
+                                          color: SwissColors.inkSecondary),
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  spot.categoryTag,
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${spot.latitude.toStringAsFixed(4)}, ${spot.longitude.toStringAsFixed(4)}',
                                   style: SwissTheme.mono(
-                                      size: 9,
-                                      weight: FontWeight.w700,
-                                      color: SwissColors.inkSecondary),
+                                      size: 9.5, color: SwissColors.inkMuted),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              spot.namaTitik,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: SwissTheme.display(
+                                  size: 14, color: SwissColors.inkPrimary),
+                            ),
+                            const SizedBox(height: 4),
+                            Expanded(
+                              child: Text(
+                                spot.deskripsi,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: SwissTheme.sans(
+                                  size: 11,
+                                  color: SwissColors.inkSecondary,
+                                  height: 1.35,
                                 ),
                               ),
-                              Text(
-                                '${spot.latitude.toStringAsFixed(4)}, ${spot.longitude.toStringAsFixed(4)}',
-                                style: SwissTheme.mono(
-                                    size: 10, color: SwissColors.inkMuted),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            spot.namaTitik,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: SwissTheme.display(
-                                size: 14, color: SwissColors.inkPrimary),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            spot.deskripsi,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: SwissTheme.sans(
-                                size: 11, color: SwissColors.inkSecondary),
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
