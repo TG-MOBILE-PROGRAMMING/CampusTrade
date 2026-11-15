@@ -46,6 +46,9 @@ class UserModel {
     if (clean.length == 1) return clean.toUpperCase();
     return clean.substring(0, 2).toUpperCase();
   }
+
+  String get noWa => whatsapp;
+  set noWa(String val) => whatsapp = val;
 }
 
 class CodSpotModel {

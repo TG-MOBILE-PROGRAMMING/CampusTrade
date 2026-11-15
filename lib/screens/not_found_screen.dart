@@ -25,7 +25,7 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SwissColors.surface,
+      backgroundColor: SwissColors.canvasWarm,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -34,9 +34,16 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: SwissColors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: SwissColors.zinc200),
+                color: SwissColors.canvasPure,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: SwissColors.borderHairline),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 16,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,11 +51,11 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                 children: [
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: SwissColors.zinc100,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: SwissColors.zinc200),
+                      color: SwissColors.dangerRose.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: SwissColors.dangerRose.withOpacity(0.2)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -57,7 +64,7 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                           width: 6,
                           height: 6,
                           decoration: const BoxDecoration(
-                            color: SwissColors.rose500,
+                            color: SwissColors.dangerRose,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -65,23 +72,25 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                         Text(
                           'HTTP STATUS // 404 NOT FOUND',
                           style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc700),
+                              size: 10,
+                              weight: FontWeight.w700,
+                              color: SwissColors.dangerRose),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
-                  Text('404.', style: SwissTheme.display(size: 46)),
+                  Text('404.', style: SwissTheme.display(size: 46, color: SwissColors.inkPrimary)),
                   const SizedBox(height: 6),
                   Text(
                     'Halaman atau Unit Inventaris Tidak Ditemukan',
-                    style: SwissTheme.display(size: 17),
+                    style: SwissTheme.display(size: 17, color: SwissColors.inkPrimary),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Tautan yang Anda akses kemungkinan telah ditarik dari katalog karena unit sudah terjual, atau alamat URL tidak terdaftar pada server CampusTrade UPI YPTK.',
                     style: SwissTheme.sans(
-                        size: 12, color: SwissColors.zinc500, height: 1.5),
+                        size: 12, color: SwissColors.inkSecondary, height: 1.5),
                   ),
                   const SizedBox(height: 18),
                   Row(
@@ -89,14 +98,22 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                       Expanded(
                         child: TextField(
                           controller: _searchCtrl,
-                          style: SwissTheme.sans(size: 12),
+                          style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
                           decoration: InputDecoration(
                             hintText: 'Cari kasur, dispenser, meja lipat...',
+                            hintStyle: SwissTheme.sans(size: 12, color: SwissColors.inkMuted),
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 11),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                                horizontal: 14, vertical: 12),
+                            filled: true,
+                            fillColor: SwissColors.canvasWarm,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: const BorderSide(color: SwissColors.borderHairline),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: const BorderSide(color: SwissColors.inkPrimary, width: 1.5),
                             ),
                           ),
                         ),
@@ -108,35 +125,42 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                           widget.appState.navigateTo('catalog');
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: SwissColors.zinc950,
+                          backgroundColor: SwissColors.rauschCoral,
                           foregroundColor: SwissColors.white,
+                          elevation: 0,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
+                              horizontal: 18, vertical: 14),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                              borderRadius: BorderRadius.circular(999)),
                         ),
-                        child: const Text('Cari'),
+                        child: Text(
+                          'Cari',
+                          style: SwissTheme.sans(size: 12, weight: FontWeight.w700),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: OutlinedButton(
                       onPressed: () => widget.appState.navigateTo('catalog'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: SwissColors.zinc950,
-                        foregroundColor: SwissColors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: SwissColors.inkPrimary,
+                        side: const BorderSide(color: SwissColors.borderHairline),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(999)),
                       ),
-                      child: const Text('Kembali ke Katalog Utama'),
+                      child: Text(
+                        'Kembali ke Katalog Utama',
+                        style: SwissTheme.sans(size: 13, weight: FontWeight.w600),
+                      ),
                     ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Divider(height: 1),
+                    child: Divider(height: 1, color: SwissColors.borderHairline),
                   ),
                   Wrap(
                     alignment: WrapAlignment.spaceBetween,
@@ -145,10 +169,10 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                     children: [
                       Text('CAMPUSTRADE // UPI YPTK',
                           style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc400)),
+                              size: 10, color: SwissColors.inkMuted)),
                       Text('HARDENED SERVER',
                           style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc400)),
+                              size: 10, color: SwissColors.inkMuted)),
                     ],
                   ),
                 ],

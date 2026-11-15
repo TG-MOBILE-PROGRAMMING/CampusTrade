@@ -60,8 +60,15 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFFEEF2F6),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: SwissColors.zinc200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: SwissColors.borderHairline),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: LayoutBuilder(
@@ -92,11 +99,11 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
               ...widget.codSpots.map((spot) {
                 final Offset pos =
                     _latLngToPixel(spot.latitude, spot.longitude, mapSize);
-                final String emoji = spot.kategori == 'dalam_kampus'
-                    ? '🏛️'
+                final IconData spotIcon = spot.kategori == 'dalam_kampus'
+                    ? Icons.account_balance
                     : spot.kategori == 'luar_kampus'
-                        ? '📍'
-                        : '🏪';
+                        ? Icons.location_on
+                        : Icons.storefront;
                 return Positioned(
                   left: pos.dx - 16,
                   top: pos.dy - 16,
@@ -126,9 +133,10 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                           ],
                         ),
                         alignment: Alignment.center,
-                        child: Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 13),
+                        child: Icon(
+                          spotIcon,
+                          size: 15,
+                          color: SwissColors.white,
                         ),
                       ),
                     ),
@@ -156,18 +164,19 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                           horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? SwissColors.indigo600
-                            : SwissColors.zinc950,
-                        borderRadius: BorderRadius.circular(5),
+                            ? SwissColors.rauschCoral
+                            : SwissColors.uberBlack,
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(
                           color: isSelected
                               ? SwissColors.white
-                              : SwissColors.zinc700,
+                              : const Color(0xFF333333),
+                          width: isSelected ? 2 : 1,
                         ),
                         boxShadow: const [
                           BoxShadow(
-                            color: Color(0x3309090B),
-                            blurRadius: 4,
+                            color: Color(0x40000000),
+                            blurRadius: 6,
                             offset: Offset(0, 2),
                           )
                         ],
@@ -185,20 +194,20 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                 );
               }),
 
-              // 4. Zoom Controls (Top Left)
+              // 4. Zoom Controls (Top Left — Uber High Contrast)
               Positioned(
-                top: 10,
-                left: 10,
+                top: 12,
+                left: 12,
                 child: Container(
                   decoration: BoxDecoration(
                     color: SwissColors.white,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: SwissColors.zinc200),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: SwissColors.uberBlack, width: 1.5),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x1409090B),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
+                        color: Color(0x1F000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
                       )
                     ],
                   ),
@@ -209,20 +218,20 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                         onTap: () => setState(
                             () => _zoom = (_zoom + 0.25).clamp(0.6, 2.5)),
                         child: const Padding(
-                          padding: EdgeInsets.all(6),
+                          padding: EdgeInsets.all(7),
                           child: Icon(Icons.add,
-                              size: 15, color: SwissColors.zinc800),
+                              size: 16, color: SwissColors.uberBlack),
                         ),
                       ),
                       Container(
-                          height: 1, width: 24, color: SwissColors.zinc200),
+                          height: 1, width: 26, color: const Color(0xFFE5E7EB)),
                       InkWell(
                         onTap: () => setState(
                             () => _zoom = (_zoom - 0.25).clamp(0.6, 2.5)),
                         child: const Padding(
-                          padding: EdgeInsets.all(6),
+                          padding: EdgeInsets.all(7),
                           child: Icon(Icons.remove,
-                              size: 15, color: SwissColors.zinc800),
+                              size: 16, color: SwissColors.uberBlack),
                         ),
                       ),
                     ],
@@ -230,27 +239,48 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                 ),
               ),
 
-              // 5. Coordinate Telemetry Badge (Top Right)
+              // 5. Coordinate Telemetry Badge (Top Right — Uber High Contrast)
               Positioned(
-                top: 10,
-                right: 10,
+                top: 12,
+                right: 12,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: const Color(0xE6FFFFFF),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: SwissColors.zinc200),
+                    color: SwissColors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: SwissColors.uberBlack, width: 1.5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    constraints.maxWidth < 360
-                        ? 'UPI YPTK LUBEG'
-                        : 'UPI YPTK LUBEG (-0.9575, 100.3972)',
-                    style: SwissTheme.mono(
-                      size: 9,
-                      weight: FontWeight.w600,
-                      color: SwissColors.zinc700,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: SwissColors.rauschCoral,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        constraints.maxWidth < 360
+                            ? 'UPI YPTK LUBEG'
+                            : 'UPI YPTK LUBEG (-0.9575, 100.3972)',
+                        style: SwissTheme.mono(
+                          size: 9,
+                          weight: FontWeight.w700,
+                          color: SwissColors.uberBlack,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -265,14 +295,14 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 320),
                       child: Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: SwissColors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: SwissColors.zinc200),
+                          color: SwissColors.canvasPure,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: SwissColors.borderHairline),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x2609090B),
+                              color: Color(0x26000000),
                               blurRadius: 16,
                               offset: Offset(0, 6),
                             )
@@ -289,34 +319,34 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                                   Text(
                                     _selectedSpot!.namaTitik,
                                     style: SwissTheme.display(
-                                      size: 12,
-                                      color: SwissColors.indigo700,
+                                      size: 13,
+                                      color: SwissColors.inkPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     _selectedSpot!.deskripsi,
                                     style: SwissTheme.sans(
-                                      size: 10,
-                                      color: SwissColors.zinc600,
+                                      size: 11,
+                                      color: SwissColors.inkSecondary,
                                     ),
                                   ),
-                                  const SizedBox(height: 5),
+                                  const SizedBox(height: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
+                                        horizontal: 7, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: SwissColors.emerald50,
-                                      borderRadius: BorderRadius.circular(4),
+                                      color: const Color(0xFFECFDF5),
+                                      borderRadius: BorderRadius.circular(999),
                                       border: Border.all(
-                                          color: SwissColors.emerald200),
+                                          color: const Color(0xFFA7F3D0)),
                                     ),
                                     child: Text(
                                       '✓ ${_selectedSpot!.categoryTag}',
                                       style: SwissTheme.mono(
                                         size: 9,
                                         weight: FontWeight.w700,
-                                        color: SwissColors.emerald800,
+                                        color: SwissColors.verifiedEmerald,
                                       ),
                                     ),
                                   ),
@@ -347,14 +377,14 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 320),
                       child: Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: SwissColors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: SwissColors.zinc200),
+                          color: SwissColors.canvasPure,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: SwissColors.borderHairline),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x2609090B),
+                              color: Color(0x26000000),
                               blurRadius: 16,
                               offset: Offset(0, 6),
                             )
@@ -363,18 +393,20 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(8),
                               child: Image.network(
                                 _hoveredProduct!.foto,
                                 width: 52,
                                 height: 52,
+                                cacheWidth: 120,
+                                cacheHeight: 120,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => Container(
                                   width: 52,
                                   height: 52,
-                                  color: SwissColors.zinc100,
+                                  color: SwissColors.canvasWarm,
                                   child: const Icon(Icons.inventory_2_outlined,
-                                      size: 20, color: SwissColors.zinc500),
+                                      size: 20, color: SwissColors.inkMuted),
                                 ),
                               ),
                             ),
@@ -389,21 +421,24 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                                     style: SwissTheme.mono(
                                       size: 9,
                                       weight: FontWeight.w700,
-                                      color: SwissColors.indigo600,
+                                      color: SwissColors.rauschCoral,
                                     ),
                                   ),
                                   Text(
                                     _hoveredProduct!.namaBarang,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: SwissTheme.display(size: 12),
+                                    style: SwissTheme.display(
+                                      size: 12,
+                                      color: SwissColors.inkPrimary,
+                                    ),
                                   ),
                                   Text(
                                     '${SwissTheme.formatRupiah(_hoveredProduct!.harga)} • ${_hoveredProduct!.distanceToCampusKm} KM',
                                     style: SwissTheme.mono(
                                       size: 10,
                                       weight: FontWeight.w700,
-                                      color: SwissColors.zinc900,
+                                      color: SwissColors.inkPrimary,
                                     ),
                                   ),
                                 ],
@@ -414,13 +449,13 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                               onPressed: () =>
                                   widget.onSelectProduct(_hoveredProduct!),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: SwissColors.indigo600,
+                                backgroundColor: SwissColors.rauschCoral,
                                 foregroundColor: SwissColors.white,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 8),
                                 minimumSize: Size.zero,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(999),
                                 ),
                               ),
                               child: Text(
@@ -445,7 +480,7 @@ class _GeospatialRadarMapState extends State<GeospatialRadarMap> {
                 right: 6,
                 child: Text(
                   '© OpenStreetMap • CampusTrade UPI',
-                  style: SwissTheme.mono(size: 8, color: SwissColors.zinc500),
+                  style: SwissTheme.mono(size: 8, color: SwissColors.inkSecondary),
                 ),
               ),
             ],
@@ -468,8 +503,15 @@ class DetailRouteMiniMap extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFFEEF2F6),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: SwissColors.zinc200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: SwissColors.borderHairline),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -479,67 +521,101 @@ class DetailRouteMiniMap extends StatelessWidget {
               painter: _DetailRoutePainter(),
             ),
           ),
-          // Seller Kos Pin
+          // Seller Kos Pin (Uber Pickup Style)
           Positioned(
-            left: 20,
-            top: 36,
+            left: 16,
+            top: 28,
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: (MediaQuery.of(context).size.width * 0.6).clamp(140.0, 260.0),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: SwissColors.rose600,
-                borderRadius: BorderRadius.circular(99),
+                color: SwissColors.uberBlack,
+                borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: SwissColors.white, width: 2),
                 boxShadow: const [
                   BoxShadow(
-                      color: Color(0x3309090B),
-                      blurRadius: 6,
-                      offset: Offset(0, 2))
+                    color: Color(0x3D000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
                 ],
               ),
-              child: Text(
-                '🏠 Kos: ${product.lokasiKos}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SwissTheme.sans(
-                  size: 10,
-                  weight: FontWeight.w700,
-                  color: SwissColors.white,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: SwissColors.rauschCoral,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Kos: ${product.lokasiKos}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SwissTheme.sans(
+                        size: 10,
+                        weight: FontWeight.w700,
+                        color: SwissColors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          // COD Spot Pin
+          // COD Spot Pin (Uber Dropoff Style)
           Positioned(
-            right: 20,
-            bottom: 32,
+            right: 16,
+            bottom: 28,
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: (MediaQuery.of(context).size.width * 0.6).clamp(140.0, 260.0),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: SwissColors.indigo700,
-                borderRadius: BorderRadius.circular(99),
+                color: SwissColors.uberBlack,
+                borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: SwissColors.white, width: 2),
                 boxShadow: const [
                   BoxShadow(
-                      color: Color(0x3309090B),
-                      blurRadius: 6,
-                      offset: Offset(0, 2))
+                    color: Color(0x3D000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
                 ],
               ),
-              child: Text(
-                '🏛️ COD: ${product.titikCod}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SwissTheme.sans(
-                  size: 10,
-                  weight: FontWeight.w700,
-                  color: SwissColors.white,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: SwissColors.escrowIndigo,
+                      shape: BoxShape.rectangle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'COD: ${product.titikCod}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SwissTheme.sans(
+                        size: 10,
+                        weight: FontWeight.w700,
+                        color: SwissColors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -573,8 +649,8 @@ class PinpointPickerMap extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFFEEF2F6),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: SwissColors.zinc300),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: SwissColors.borderHairline),
       ),
       clipBehavior: Clip.antiAlias,
       child: LayoutBuilder(
@@ -613,8 +689,8 @@ class PinpointPickerMap extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: SwissColors.indigo700,
-                      borderRadius: BorderRadius.circular(99),
+                      color: SwissColors.uberBlack,
+                      borderRadius: BorderRadius.circular(999),
                       border: Border.all(color: SwissColors.white, width: 2),
                       boxShadow: const [
                         BoxShadow(
@@ -624,13 +700,20 @@ class PinpointPickerMap extends StatelessWidget {
                         )
                       ],
                     ),
-                    child: Text(
-                      '📍 Lokasi Kos Anda',
-                      style: SwissTheme.sans(
-                        size: 10,
-                        weight: FontWeight.w700,
-                        color: SwissColors.white,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.location_on, size: 12, color: SwissColors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Lokasi Kos Anda',
+                          style: SwissTheme.sans(
+                            size: 10,
+                            weight: FontWeight.w700,
+                            color: SwissColors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -642,7 +725,7 @@ class PinpointPickerMap extends StatelessWidget {
                     'Ketuk atau geser pin untuk menyematkan koordinat kos',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: SwissTheme.mono(size: 8, color: SwissColors.zinc600),
+                    style: SwissTheme.mono(size: 8, color: SwissColors.inkSecondary),
                   ),
                 ),
               ],

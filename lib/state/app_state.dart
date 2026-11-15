@@ -714,6 +714,14 @@ class CampusTradeState extends ChangeNotifier {
       return 'Username hanya boleh berisi huruf, angka, dan garis bawah (_) tanpa spasi (3-30 karakter).';
     }
 
+    if (!RegExp(r'^[0-9]{8,18}$').hasMatch(nimClean)) {
+      return 'NIM harus berupa angka valid (8-18 digit)!';
+    }
+
+    if (waClean.length < 10) {
+      return 'Nomor WhatsApp tidak valid (minimal 10 digit angka)!';
+    }
+
     if (users.any((u) => u.username.toLowerCase() == uClean)) {
       return "Username '@$uClean' sudah digunakan oleh pengguna lain. Silakan pilih username unik lain!";
     }
@@ -817,6 +825,23 @@ class CampusTradeState extends ChangeNotifier {
     return feeStandar;
   }
 
+  int calculateShippingFee(String category, double distanceKm) {
+    final int baseFee =
+        int.tryParse(platformSettings['ongkir_dasar'] ?? '10000') ?? 10000;
+    final int perKm =
+        int.tryParse(platformSettings['ongkir_per_km'] ?? '2500') ?? 2500;
+    final int heavyHandling =
+        int.tryParse(platformSettings['biaya_handling_berat'] ?? '5000') ?? 5000;
+
+    int total = baseFee + (distanceKm * perKm).round();
+    if (category.contains('Perabotan') ||
+        category.contains('Kasur') ||
+        category.contains('Meja')) {
+      total += heavyHandling;
+    }
+    return total;
+  }
+
   void createProductListing({
     required String namaBarang,
     required String kategori,
@@ -830,17 +855,32 @@ class CampusTradeState extends ChangeNotifier {
     required String deskripsi,
     String? fotoUrl,
   }) {
+    if (currentUser == null) {
+      flashError = 'Silakan login terlebih dahulu untuk memasang iklan!';
+      notifyListeners();
+      return;
+    }
+    if (currentUser!.role != 'admin' &&
+        currentUser!.statusVerifikasi != 'approved') {
+      flashWarning =
+          'Akun Anda belum diverifikasi KTM/KRS oleh Admin. Iklan tidak dapat dipasang.';
+      notifyListeners();
+      return;
+    }
+
     final int nextId = products.isEmpty
         ? 1
         : (products.map((e) => e.id).reduce((a, b) => a > b ? a : b) + 1);
     final int feeAdmin = calculateAdminFeeForProduct(kategori, harga);
-    final int ongkirAdmin = kategori.contains('Perabotan') ? 15000 : 10000;
+    final double dist = ProductModel.calculateDistance(
+        campusLat, campusLng, latitude, longitude);
+    final int ongkirAdmin = calculateShippingFee(kategori, dist);
 
     final String defaultPhoto = _defaultPhotoForCategory(kategori);
 
     final ProductModel newProd = ProductModel(
       id: nextId,
-      userId: currentUser?.id ?? 1,
+      userId: currentUser!.id,
       namaBarang: namaBarang.trim(),
       kategori: kategori,
       harga: harga,
@@ -860,11 +900,10 @@ class CampusTradeState extends ChangeNotifier {
           ? fotoUrl.trim()
           : defaultPhoto,
       statusVerifikasi: 'approved',
-      namaPenjual: currentUser?.nama ?? 'Mahasiswa UPI YPTK',
-      nimPenjual: currentUser?.nim ?? '24101152610172',
-      jurusanPenjual:
-          currentUser?.jurusan ?? 'Teknik Informatika (Fasilkom)',
-      waPenjual: currentUser?.whatsapp ?? '6281234567890',
+      namaPenjual: currentUser!.nama,
+      nimPenjual: currentUser!.nim,
+      jurusanPenjual: currentUser!.jurusan,
+      waPenjual: currentUser!.whatsapp,
     );
 
     products.insert(0, newProd);
@@ -891,8 +930,18 @@ class CampusTradeState extends ChangeNotifier {
   }
 
   void deleteProduct(int id) {
-    products.removeWhere((p) => p.id == id);
-    flashSuccess = 'Unit inventaris #$id berhasil dihapus dari katalog.';
+    final int idx = products.indexWhere((p) => p.id == id);
+    if (idx == -1) return;
+    final p = products[idx];
+    if (currentUser != null &&
+        currentUser!.role != 'admin' &&
+        currentUser!.id != p.userId) {
+      flashError = 'Anda tidak memiliki otoritas untuk menghapus unit ini!';
+      notifyListeners();
+      return;
+    }
+    products.removeAt(idx);
+    flashSuccess = 'Unit "${p.namaBarang}" (#$id) berhasil dihapus dari katalog.';
     notifyListeners();
   }
 
@@ -901,6 +950,69 @@ class CampusTradeState extends ChangeNotifier {
       if (p.id == id) {
         p.statusVerifikasi = 'approved';
         flashSuccess = 'Unit "${p.namaBarang}" telah disetujui (APPROVED).';
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
+  void rejectProduct(int id, String reason) {
+    for (final p in products) {
+      if (p.id == id) {
+        p.statusVerifikasi = 'rejected';
+        p.catatanQcAdmin = reason.trim().isNotEmpty
+            ? reason.trim()
+            : 'Tidak lolos standar kelayakan fisik/deskripsi admin.';
+        flashWarning =
+            'Unit "${p.namaBarang}" ditolak QC: "${p.catatanQcAdmin}".';
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
+  OrderModel createOrder({
+    required int productId,
+    int? buyerId,
+    int? sellerId,
+    required String metodePenyerahan,
+    required String titikCod,
+    String? alamatAntar,
+    required int hargaBarang,
+    required int feeAdmin,
+    required int ongkir,
+    required int totalBayar,
+  }) {
+    final int nextId = orders.isEmpty
+        ? 1
+        : (orders.map((e) => e.id).reduce((a, b) => a > b ? a : b) + 1);
+
+    final newOrder = OrderModel(
+      id: nextId,
+      productId: productId,
+      buyerId: buyerId ?? currentUser?.id,
+      sellerId: sellerId,
+      metodePenyerahan: metodePenyerahan,
+      titikCod: titikCod,
+      alamatAntar: alamatAntar,
+      hargaBarang: hargaBarang,
+      feeAdmin: feeAdmin,
+      ongkir: ongkir,
+      totalBayar: totalBayar,
+      status: 'diajukan',
+    );
+
+    orders.insert(0, newOrder);
+    notifyListeners();
+    return newOrder;
+  }
+
+  void updateOrderStatus(int orderId, String newStatus) {
+    for (final o in orders) {
+      if (o.id == orderId) {
+        o.status = newStatus;
+        flashSuccess =
+            'Status pesanan #$orderId diubah menjadi ${newStatus.toUpperCase()}.';
         break;
       }
     }
@@ -1099,6 +1211,8 @@ class CampusTradeState extends ChangeNotifier {
     }).toList();
   }
 
+  int get countAllUsers => users.length;
+
   void approveUserKtm(int userId) {
     for (final u in users) {
       if (u.id == userId) {
@@ -1207,6 +1321,9 @@ class CampusTradeState extends ChangeNotifier {
   }
 
   void adminDeleteUser(int id) {
+    if (currentUser?.id == id) {
+      currentUser = null;
+    }
     users.removeWhere((u) => u.id == id && u.role != 'admin');
     flashSuccess = 'Akun pengguna berhasil dihapus.';
     notifyListeners();

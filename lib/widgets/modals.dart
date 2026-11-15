@@ -68,6 +68,18 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
     final String waUrl =
         'https://wa.me/$adminPhone?text=${Uri.encodeComponent(messageText)}';
 
+    // Persist order in backend state
+    widget.appState.createOrder(
+      productId: p.id,
+      sellerId: p.userId,
+      metodePenyerahan: _deliveryMethod,
+      titikCod: p.titikCod,
+      hargaBarang: p.harga,
+      feeAdmin: p.biayaVerifikasi,
+      ongkir: _ongkir,
+      totalBayar: _total,
+    );
+
     Clipboard.setData(ClipboardData(text: messageText));
 
     showDialog(
@@ -109,28 +121,28 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
               children: [
                 Text(
                   'Pesan transaksi otomatis telah disalin ke Clipboard & siap diteruskan ke WhatsApp Admin ($adminPhone):',
-                  style: SwissTheme.sans(size: 11, color: SwissColors.zinc600),
+                  style: SwissTheme.sans(size: 11, color: SwissColors.inkSecondary),
                 ),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: SwissColors.zinc50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: SwissColors.zinc200),
+                    color: SwissColors.canvasSubtle,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: SwissColors.borderHairline),
                   ),
                   child: SelectableText(
                     messageText,
                     style:
-                        SwissTheme.mono(size: 10, color: SwissColors.zinc800),
+                        SwissTheme.mono(size: 10, color: SwissColors.inkPrimary),
                   ),
                 ),
                 const SizedBox(height: 8),
                 SelectableText(
                   waUrl,
                   maxLines: 2,
-                  style: SwissTheme.mono(size: 9, color: SwissColors.indigo600),
+                  style: SwissTheme.mono(size: 9, color: SwissColors.escrowIndigo),
                 ),
               ],
             ),
@@ -154,11 +166,11 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
     final double maxDialogHeight = MediaQuery.of(context).size.height * 0.88;
 
     return Dialog(
-      backgroundColor: SwissColors.white,
+      backgroundColor: SwissColors.canvasPure,
       insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: SwissColors.zinc200),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: SwissColors.borderHairline),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 672, maxHeight: maxDialogHeight),
@@ -169,9 +181,9 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: const BoxDecoration(
-                color: SwissColors.zinc50,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                border: Border(bottom: BorderSide(color: SwissColors.zinc200)),
+                color: SwissColors.canvasPure,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                border: Border(bottom: BorderSide(color: SwissColors.borderHairline)),
               ),
               child: Row(
                 children: [
@@ -183,24 +195,26 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: SwissColors.zinc950,
-                            borderRadius: BorderRadius.circular(4),
+                            color: SwissColors.inkPrimary,
+                            borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             p.kategori.toUpperCase(),
                             style: SwissTheme.mono(
-                                size: 10, color: SwissColors.white),
+                                size: 10,
+                                weight: FontWeight.w700,
+                                color: SwissColors.white),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: SwissColors.emerald50,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: SwissColors.emerald200),
+                            color: const Color(0xFFECFDF5),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFA7F3D0)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -209,7 +223,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                 width: 6,
                                 height: 6,
                                 decoration: const BoxDecoration(
-                                  color: SwissColors.emerald500,
+                                  color: SwissColors.verifiedEmerald,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -217,23 +231,27 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                               Text(
                                 'QC VERIFIED',
                                 style: SwissTheme.mono(
-                                    size: 10, color: SwissColors.emerald700),
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.verifiedEmerald),
                               ),
                             ],
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: SwissColors.white,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: SwissColors.zinc200),
+                            color: SwissColors.canvasWarm,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: SwissColors.borderHairline),
                           ),
                           child: Text(
                             '$dist km dr Kampus',
                             style: SwissTheme.mono(
-                                size: 10, color: SwissColors.zinc700),
+                                size: 10,
+                                weight: FontWeight.w700,
+                                color: SwissColors.inkPrimary),
                           ),
                         ),
                       ],
@@ -241,7 +259,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const Icon(Icons.close, size: 18, color: SwissColors.inkSecondary),
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
@@ -260,13 +278,13 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                       builder: (ctx, c) {
                         final bool wide = c.maxWidth >= 500;
                         final Widget imageBox = ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                           child: Container(
                             height: 220,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: SwissColors.zinc100,
-                              border: Border.all(color: SwissColors.zinc200),
+                              color: SwissColors.canvasWarm,
+                              border: Border.all(color: SwissColors.borderHairline),
                             ),
                             child: Stack(
                               fit: StackFit.expand,
@@ -274,9 +292,10 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                 Image.network(
                                   p.foto,
                                   fit: BoxFit.cover,
+                                  cacheWidth: 600,
                                   errorBuilder: (_, __, ___) => const Center(
                                     child: Icon(Icons.image_outlined,
-                                        size: 40, color: SwissColors.zinc400),
+                                        size: 40, color: SwissColors.inkMuted),
                                   ),
                                 ),
                                 Positioned(
@@ -289,8 +308,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xD909090B),
-                                        borderRadius: BorderRadius.circular(4),
+                                        color: const Color(0xCC000000),
+                                        borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         p.kondisi,
@@ -312,16 +331,19 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                           children: [
                             Text(
                               p.namaBarang,
-                              style: SwissTheme.display(size: 19, height: 1.25),
+                              style: SwissTheme.display(
+                                  size: 19,
+                                  height: 1.25,
+                                  color: SwissColors.inkPrimary),
                             ),
                             const SizedBox(height: 12),
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: SwissColors.zinc50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: SwissColors.zinc200),
+                                color: SwissColors.canvasWarm,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: SwissColors.borderHairline),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +351,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                   Text(
                                     'HARGA BUKA UNIT',
                                     style: SwissTheme.mono(
-                                        size: 10, color: SwissColors.zinc400),
+                                        size: 10, color: SwissColors.inkMuted),
                                   ),
                                   const SizedBox(height: 4),
                                   Wrap(
@@ -339,14 +361,16 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                     children: [
                                       Text(
                                         SwissTheme.formatRupiah(p.harga),
-                                        style: SwissTheme.display(size: 24),
+                                        style: SwissTheme.display(
+                                            size: 24,
+                                            color: SwissColors.inkPrimary),
                                       ),
                                       Text(
                                         SwissTheme.formatRupiah(
                                             p.effectiveOriginalPrice),
                                         style: SwissTheme.mono(
                                           size: 12,
-                                          color: SwissColors.zinc400,
+                                          color: SwissColors.inkMuted,
                                           decoration:
                                               TextDecoration.lineThrough,
                                         ),
@@ -359,15 +383,15 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                             const SizedBox(height: 12),
                             Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: SwissColors.zinc200),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: SwissColors.borderHairline),
                               ),
                               child: Column(
                                 children: [
                                   _specRow('PENJUAL', p.namaPenjual),
-                                  const Divider(height: 1),
+                                  const Divider(height: 1, color: SwissColors.borderHairline),
                                   _specRow('LOKASI KOS', p.lokasiKos),
-                                  const Divider(height: 1),
+                                  const Divider(height: 1, color: SwissColors.borderHairline),
                                   Container(
                                     color: const Color(0x66EEF2FF),
                                     child: _specRow(
@@ -405,27 +429,136 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
 
                     const SizedBox(height: 20),
 
-                    // Section 2: Geospatial Route Map
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          'PETA LOKASI KOS & RUTE TITIK COD',
-                          style: SwissTheme.mono(
-                              size: 10, color: SwissColors.zinc500),
-                        ),
-                        Text(
-                          '📍 Jarak: $dist km ($travelMins mnt)',
-                          style: SwissTheme.mono(
-                              size: 10, color: SwissColors.indigo600),
-                        ),
-                      ],
+                    // Section 2: Geospatial Route Map & Uber Pickup-Dropoff Connector
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: SwissColors.canvasWarm,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: SwissColors.borderHairline),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'RUTE LOGISTIK COD GAYA UBER',
+                                style: SwissTheme.mono(
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.inkPrimary),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.near_me, size: 11, color: SwissColors.escrowIndigo),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Jarak: $dist km ($travelMins mnt)',
+                                    style: SwissTheme.mono(
+                                      size: 10,
+                                      weight: FontWeight.w700,
+                                      color: SwissColors.escrowIndigo,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          // Uber Pickup-Dropoff Step Visualizer
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                children: [
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: const BoxDecoration(
+                                      color: SwissColors.rauschCoral,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 2,
+                                    height: 24,
+                                    color: SwissColors.inkMuted,
+                                  ),
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: const BoxDecoration(
+                                      color: SwissColors.escrowIndigo,
+                                      shape: BoxShape.rectangle,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'PICKUP: ',
+                                          style: SwissTheme.mono(
+                                              size: 9,
+                                              weight: FontWeight.w700,
+                                              color: SwissColors.rauschCoral),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            p.lokasiKos,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: SwissTheme.sans(
+                                              size: 11,
+                                              weight: FontWeight.w600,
+                                              color: SwissColors.inkPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'DROPOFF: ',
+                                          style: SwissTheme.mono(
+                                              size: 9,
+                                              weight: FontWeight.w700,
+                                              color: SwissColors.escrowIndigo),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            p.titikCod,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: SwissTheme.sans(
+                                              size: 11,
+                                              weight: FontWeight.w600,
+                                              color: SwissColors.inkPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          DetailRouteMiniMap(product: p),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    DetailRouteMiniMap(product: p),
 
                     const SizedBox(height: 18),
 
@@ -482,22 +615,24 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                     Text(
                       'DESKRIPSI & RIWAYAT PEMAKAIAN',
                       style: SwissTheme.mono(
-                          size: 10, color: SwissColors.zinc500),
+                          size: 10,
+                          weight: FontWeight.w700,
+                          color: SwissColors.inkMuted),
                     ),
                     const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: SwissColors.zinc50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: SwissColors.zinc200),
+                        color: SwissColors.canvasWarm,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: SwissColors.borderHairline),
                       ),
                       child: Text(
                         p.deskripsi,
                         style: SwissTheme.sans(
                           size: 12,
-                          color: SwissColors.zinc700,
+                          color: SwissColors.inkPrimary,
                           height: 1.5,
                         ),
                       ),
@@ -505,24 +640,47 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
 
                     const SizedBox(height: 18),
 
-                    // Section 5: Fulfillment & Transparent Cost Breakdown
+                    // Section 5: Fulfillment & Stripe Escrow Cost Breakdown
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: SwissColors.zinc50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: SwissColors.zinc200),
+                        color: SwissColors.canvasWarm,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: SwissColors.borderHairline),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'OPSI SERAH TERIMA & KALKULASI BIAYA TRANSPARAN',
-                            style: SwissTheme.mono(
-                              size: 10,
-                              weight: FontWeight.w700,
-                              color: SwissColors.zinc900,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'OPSI SERAH TERIMA & INVOICE REKBER',
+                                style: SwissTheme.mono(
+                                  size: 10,
+                                  weight: FontWeight.w700,
+                                  color: SwissColors.inkPrimary,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                      color: const Color(0xFFC7D2FE)),
+                                ),
+                                child: Text(
+                                  'STRIPE ESCROW',
+                                  style: SwissTheme.mono(
+                                    size: 9,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.escrowIndigo,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           LayoutBuilder(
@@ -531,7 +689,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                 value: 'jemput_admin',
                                 title: 'Jemput COD di Kampus',
                                 badge: 'RP 0',
-                                badgeColor: SwissColors.emerald700,
+                                badgeColor: SwissColors.verifiedEmerald,
                                 subtitle:
                                     'Serah terima didampingi admin di titik COD resmi.',
                               );
@@ -540,7 +698,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                 title: 'Kurir Admin Antar-Kos',
                                 badge:
                                     '+${SwissTheme.formatRupiah(p.biayaOngkir)}',
-                                badgeColor: SwissColors.indigo600,
+                                badgeColor: SwissColors.escrowIndigo,
                                 subtitle:
                                     'Dijemput dari kos penjual & diantar ke kos Anda.',
                               );
@@ -562,13 +720,21 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                               );
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 14),
+                          // Stripe Style Escrow Cost Breakdown Card
                           Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: SwissColors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: SwissColors.zinc200),
+                              color: SwissColors.escrowBg,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: SwissColors.escrowBorder),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x05000000),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Column(
                               children: [
@@ -578,39 +744,55 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                                 ),
                                 const SizedBox(height: 8),
                                 _invoiceRow(
-                                  'Jasa Verifikasi Fisik & Rekber Admin (PROTEKSI)',
+                                  'Jasa Verifikasi Fisik & Rekber Admin',
                                   '+${SwissTheme.formatRupiah(p.biayaVerifikasi)}',
-                                  valueColor: SwissColors.indigo600,
+                                  valueColor: SwissColors.escrowIndigo,
                                 ),
                                 const SizedBox(height: 8),
                                 _invoiceRow(
-                                  'Tarif Pengantaran Kurir Admin',
+                                  'Tarif Kurir Antar-Kos',
                                   _ongkir > 0
                                       ? '+${SwissTheme.formatRupiah(_ongkir)} (Kurir Admin)'
-                                      : 'Rp 0 (Jemput Mandiri di Kampus)',
+                                      : 'Rp 0 (COD Mandiri di Kampus)',
+                                  valueColor: _ongkir > 0
+                                      ? SwissColors.inkPrimary
+                                      : SwissColors.verifiedEmerald,
                                 ),
                                 const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Divider(height: 1),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  child: Divider(
+                                      height: 1, color: Color(0xFFE2E8F0)),
                                 ),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Total Estimasi Transaksi',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: SwissTheme.display(size: 13),
-                                      ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'TOTAL ESTIMASI BAYAR',
+                                          style: SwissTheme.mono(
+                                            size: 10,
+                                            weight: FontWeight.w700,
+                                            color: SwissColors.inkSecondary,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Dana ditahan aman di Rekber',
+                                          style: SwissTheme.sans(
+                                            size: 10,
+                                            color: SwissColors.inkMuted,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
                                     Text(
                                       SwissTheme.formatRupiah(_total),
                                       style: SwissTheme.display(
-                                        size: 16,
-                                        color: SwissColors.indigo600,
+                                        size: 18,
+                                        color: SwissColors.escrowIndigo,
                                       ),
                                     ),
                                   ],
@@ -626,14 +808,21 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
               ),
             ),
 
-            // Modal Footer (Sticky CTA)
+            // Modal Footer (Sticky Bottom Bar with Escrow Guarantee)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: const BoxDecoration(
-                color: SwissColors.white,
+                color: SwissColors.canvasPure,
                 borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(12)),
-                border: Border(top: BorderSide(color: SwissColors.zinc200)),
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
+                border: Border(top: BorderSide(color: SwissColors.borderHairline)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x0F000000),
+                    blurRadius: 12,
+                    offset: Offset(0, -4),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -642,44 +831,50 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                   Row(
                     children: [
                       Container(
-                        width: 6,
-                        height: 6,
+                        width: 7,
+                        height: 7,
                         decoration: const BoxDecoration(
-                          color: SwissColors.emerald500,
+                          color: SwissColors.verifiedEmerald,
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'ESCROW // DANA DITERUSKAN SETELAH CEK FISIK',
+                          'ESCROW TERPROTEKSI // REKBER & KURIR RESMI UPI YPTK',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: SwissTheme.mono(
-                              size: 9, color: SwissColors.zinc500),
+                            size: 9,
+                            weight: FontWeight.w700,
+                            color: SwissColors.inkSecondary,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: _triggerWhatsAppOrder,
-                    icon: const Icon(Icons.arrow_forward, size: 15),
+                    icon: const Icon(Icons.shield_outlined, size: 16),
                     label: Text(
-                      'Proses Transaksi via WhatsApp Admin',
+                      'Beli Sekarang via Rekber WhatsApp',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: SwissTheme.sans(
-                        size: 12,
-                        weight: FontWeight.w600,
+                        size: 13,
+                        weight: FontWeight.w700,
                         color: SwissColors.white,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: SwissColors.zinc950,
+                      backgroundColor: SwissColors.escrowIndigo,
                       foregroundColor: SwissColors.white,
+                      elevation: 0,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 11),
+                          horizontal: 16, vertical: 13),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
                   ),
@@ -694,7 +889,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
 
   Widget _specRow(String label, String value, {bool highlight = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -702,7 +897,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             label,
             style: SwissTheme.mono(
               size: 10,
-              color: highlight ? SwissColors.indigo700 : SwissColors.zinc500,
+              weight: FontWeight.w700,
+              color: highlight ? SwissColors.escrowIndigo : SwissColors.inkMuted,
             ),
           ),
           const SizedBox(width: 8),
@@ -715,7 +911,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
               style: SwissTheme.sans(
                 size: 12,
                 weight: highlight ? FontWeight.w700 : FontWeight.w600,
-                color: highlight ? SwissColors.indigo700 : SwissColors.zinc900,
+                color: highlight ? SwissColors.escrowIndigo : SwissColors.inkPrimary,
               ),
             ),
           ),
@@ -734,16 +930,25 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
     final bool selected = _deliveryMethod == value;
     return InkWell(
       onTap: () => setState(() => _deliveryMethod = value),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: SwissColors.white,
-          borderRadius: BorderRadius.circular(8),
+          color: SwissColors.canvasPure,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? SwissColors.zinc950 : SwissColors.zinc200,
+            color: selected ? SwissColors.escrowIndigo : SwissColors.borderHairline,
             width: selected ? 2 : 1,
           ),
+          boxShadow: selected
+              ? const [
+                  BoxShadow(
+                    color: Color(0x14635BFF),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,7 +962,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                     style: SwissTheme.sans(
                       size: 12,
                       weight: FontWeight.w700,
-                      color: SwissColors.zinc950,
+                      color: SwissColors.inkPrimary,
                     ),
                   ),
                 ),
@@ -774,7 +979,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: SwissTheme.sans(size: 11, color: SwissColors.zinc500),
+              style: SwissTheme.sans(size: 11, color: SwissColors.inkSecondary),
             ),
           ],
         ),
@@ -790,7 +995,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
         Expanded(
           child: Text(
             label,
-            style: SwissTheme.sans(size: 12, color: SwissColors.zinc600),
+            style: SwissTheme.sans(size: 12, color: SwissColors.inkSecondary),
           ),
         ),
         const SizedBox(width: 8),
@@ -800,7 +1005,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
           style: SwissTheme.mono(
             size: 11,
             weight: FontWeight.w600,
-            color: valueColor ?? SwissColors.zinc900,
+            color: valueColor ?? SwissColors.inkPrimary,
           ),
         ),
       ],
@@ -916,11 +1121,11 @@ class _SellProductDialogState extends State<_SellProductDialog> {
     final double maxDialogHeight = MediaQuery.of(context).size.height * 0.88;
 
     return Dialog(
-      backgroundColor: SwissColors.white,
+      backgroundColor: SwissColors.canvasPure,
       insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: SwissColors.zinc200),
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: SwissColors.borderHairline),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 580, maxHeight: maxDialogHeight),
@@ -931,9 +1136,9 @@ class _SellProductDialogState extends State<_SellProductDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: const BoxDecoration(
-                color: SwissColors.zinc50,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                border: Border(bottom: BorderSide(color: SwissColors.zinc200)),
+                color: SwissColors.canvasPure,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                border: Border(bottom: BorderSide(color: SwissColors.borderHairline)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -946,22 +1151,25 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: SwissColors.zinc950,
-                                borderRadius: BorderRadius.circular(4),
+                                color: SwissColors.inkPrimary,
+                                borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
                                 'FORM LISTING',
                                 style: SwissTheme.mono(
-                                    size: 10, color: SwissColors.white),
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.white),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 'Jual Inventaris & Barang Kos',
-                                style: SwissTheme.display(size: 15),
+                                style: SwissTheme.display(
+                                    size: 15, color: SwissColors.inkPrimary),
                               ),
                             ),
                           ],
@@ -970,14 +1178,14 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                         Text(
                           'Khusus mahasiswa aktif UPI YPTK Padang terverifikasi KTM',
                           style:
-                              SwissTheme.sans(size: 11, color: SwissColors.zinc500),
+                              SwissTheme.sans(size: 11, color: SwissColors.inkSecondary),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const Icon(Icons.close, size: 18, color: SwissColors.inkSecondary),
                   ),
                 ],
               ),
@@ -1004,67 +1212,59 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                       ),
                       const SizedBox(height: 14),
 
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _fieldLabel('KATEGORI *'),
-                                DropdownButtonFormField<String>(
-                                  initialValue: _selectedCategory,
-                                  isExpanded: true,
-                                  style: SwissTheme.sans(size: 12),
-                                  decoration: _inputDecoration(''),
-                                  items: _categories
-                                      .map((c) => DropdownMenuItem(
-                                          value: c, child: Text(c)))
-                                      .toList(),
-                                  onChanged: (v) {
-                                    if (v != null) {
-                                      setState(() => _selectedCategory = v);
-                                    }
-                                  },
-                                ),
-                              ],
+                      SwissFormRow(
+                        first: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('KATEGORI *'),
+                            DropdownButtonFormField<String>(
+                              initialValue: _selectedCategory,
+                              isExpanded: true,
+                              style: SwissTheme.sans(size: 12),
+                              decoration: _inputDecoration(''),
+                              items: _categories
+                                  .map((c) => DropdownMenuItem(
+                                      value: c, child: Text(c)))
+                                  .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _selectedCategory = v);
+                                }
+                              },
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _fieldLabel('HARGA BUKA (RP) *'),
-                                TextFormField(
-                                  controller: _priceCtrl,
-                                  keyboardType: TextInputType.number,
-                                  style: SwissTheme.mono(
-                                      size: 12, color: SwissColors.zinc900),
-                                  decoration: _inputDecoration('180000'),
-                                  onChanged: (_) => setState(() {}),
-                                  validator: (v) {
-                                    final n = int.tryParse(v?.trim() ?? '');
-                                    if (n == null || n <= 0) {
-                                      return 'Masukkan harga valid';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
+                          ],
+                        ),
+                        second: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('HARGA BUKA (RP) *'),
+                            TextFormField(
+                              controller: _priceCtrl,
+                              keyboardType: TextInputType.number,
+                              style: SwissTheme.mono(
+                                  size: 12, color: SwissColors.inkPrimary),
+                              decoration: _inputDecoration('180000'),
+                              onChanged: (_) => setState(() {}),
+                              validator: (v) {
+                                final n = int.tryParse(v?.trim() ?? '');
+                                if (n == null || n <= 0) {
+                                  return 'Masukkan harga valid';
+                                }
+                                return null;
+                              },
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 14),
 
                       // Net Revenue Box
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: SwissColors.zinc50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: SwissColors.zinc200),
+                          color: SwissColors.canvasWarm,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: SwissColors.borderHairline),
                         ),
                         child: Wrap(
                           alignment: WrapAlignment.spaceBetween,
@@ -1077,12 +1277,17 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                                 Text(
                                   'FEE INSPEKSI QC ADMIN',
                                   style: SwissTheme.mono(
-                                      size: 10, color: SwissColors.zinc500),
+                                      size: 10,
+                                      weight: FontWeight.w700,
+                                      color: SwissColors.inkMuted),
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
                                   'Rp 3.000 – Rp 10.000 (Sesuai Kategori)',
                                   style: SwissTheme.mono(
-                                      size: 11, color: SwissColors.zinc800),
+                                      size: 11,
+                                      weight: FontWeight.w600,
+                                      color: SwissColors.inkPrimary),
                                 ),
                               ],
                             ),
@@ -1092,13 +1297,16 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                                 Text(
                                   'ESTIMASI BERSIH DITERIMA',
                                   style: SwissTheme.mono(
-                                      size: 10, color: SwissColors.zinc500),
+                                      size: 10,
+                                      weight: FontWeight.w700,
+                                      color: SwissColors.inkMuted),
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
                                   SwissTheme.formatRupiah(_netRevenue),
                                   style: SwissTheme.display(
-                                    size: 15,
-                                    color: SwissColors.emerald600,
+                                    size: 16,
+                                    color: SwissColors.verifiedEmerald,
                                   ),
                                 ),
                               ],
@@ -1124,69 +1332,62 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                       ),
                       const SizedBox(height: 14),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _fieldLabel('METODE SERAH TERIMA *'),
-                                DropdownButtonFormField<String>(
-                                  initialValue: _selectedDelivery,
-                                  isExpanded: true,
-                                  style: SwissTheme.sans(size: 12),
-                                  decoration: _inputDecoration(''),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'semua',
-                                      child: Text(
-                                          'Fleksibel (COD & Kurir Admin)'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'jemput_mandiri',
-                                      child: Text('Hanya COD di Titik Resmi'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'kurir_admin',
-                                      child: Text('Wajib Diantar Kurir Admin'),
-                                    ),
-                                  ],
-                                  onChanged: (v) {
-                                    if (v != null) {
-                                      setState(() => _selectedDelivery = v);
-                                    }
-                                  },
+                      SwissFormRow(
+                        first: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('METODE SERAH TERIMA *'),
+                            DropdownButtonFormField<String>(
+                              initialValue: _selectedDelivery,
+                              isExpanded: true,
+                              style: SwissTheme.sans(size: 12),
+                              decoration: _inputDecoration(''),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'semua',
+                                  child: Text(
+                                      'Fleksibel (COD & Kurir Admin)'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'jemput_mandiri',
+                                  child: Text('Hanya COD di Titik Resmi'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'kurir_admin',
+                                  child: Text('Wajib Diantar Kurir Admin'),
                                 ),
                               ],
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _selectedDelivery = v);
+                                }
+                              },
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _fieldLabel('TITIK TEMU COD UTAMA *'),
-                                DropdownButtonFormField<String>(
-                                  initialValue: _selectedCodSpot,
-                                  isExpanded: true,
-                                  style: SwissTheme.sans(size: 12),
-                                  decoration: _inputDecoration(''),
-                                  items: activeSpots
-                                      .map((s) => DropdownMenuItem(
-                                            value: s.namaTitik,
-                                            child: Text(s.namaTitik),
-                                          ))
-                                      .toList(),
-                                  onChanged: (v) {
-                                    if (v != null) {
-                                      setState(() => _selectedCodSpot = v);
-                                    }
-                                  },
-                                ),
-                              ],
+                          ],
+                        ),
+                        second: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('TITIK TEMU COD UTAMA *'),
+                            DropdownButtonFormField<String>(
+                              initialValue: _selectedCodSpot,
+                              isExpanded: true,
+                              style: SwissTheme.sans(size: 12),
+                              decoration: _inputDecoration(''),
+                              items: activeSpots
+                                  .map((s) => DropdownMenuItem(
+                                        value: s.namaTitik,
+                                        child: Text(s.namaTitik),
+                                      ))
+                                  .toList(),
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _selectedCodSpot = v);
+                                }
+                              },
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 14),
 
@@ -1209,12 +1410,12 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                           Text(
                             'TITIK KOORDINAT KOS (GESER PIN)',
                             style: SwissTheme.mono(
-                                size: 10, color: SwissColors.zinc700),
+                                size: 10, color: SwissColors.inkSecondary),
                           ),
                           Text(
                             '${_latitude.toStringAsFixed(4)}, ${_longitude.toStringAsFixed(4)}',
                             style: SwissTheme.mono(
-                                size: 10, color: SwissColors.indigo600),
+                                size: 10, color: SwissColors.escrowIndigo),
                           ),
                         ],
                       ),
@@ -1261,10 +1462,10 @@ class _SellProductDialogState extends State<_SellProductDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: const BoxDecoration(
-                color: SwissColors.white,
+                color: SwissColors.canvasPure,
                 borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(12)),
-                border: Border(top: BorderSide(color: SwissColors.zinc200)),
+                    BorderRadius.vertical(bottom: Radius.circular(16)),
+                border: Border(top: BorderSide(color: SwissColors.borderHairline)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -1273,25 +1474,26 @@ class _SellProductDialogState extends State<_SellProductDialog> {
                     onPressed: () => Navigator.pop(context),
                     child: Text('Batal',
                         style: SwissTheme.sans(
-                            size: 12, color: SwissColors.zinc600)),
+                            size: 12, color: SwissColors.inkSecondary)),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: SwissColors.zinc950,
+                      backgroundColor: SwissColors.rauschCoral,
                       foregroundColor: SwissColors.white,
+                      elevation: 0,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 12),
+                          horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
                     child: Text(
                       'Publikasikan Unit',
                       style: SwissTheme.sans(
                         size: 12,
-                        weight: FontWeight.w600,
+                        weight: FontWeight.w700,
                         color: SwissColors.white,
                       ),
                     ),
@@ -1440,14 +1642,16 @@ class _AuthDialogState extends State<_AuthDialog> {
     return Dialog(
       backgroundColor: SwissColors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+      elevation: 20,
+      shadowColor: Colors.black.withOpacity(0.12),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: SwissColors.zinc200),
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: SwissColors.borderHairline),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 450, maxHeight: maxDialogHeight),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(22),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -1464,53 +1668,58 @@ class _AuthDialogState extends State<_AuthDialog> {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: SwissColors.zinc950,
-                                borderRadius: BorderRadius.circular(4),
+                                color: SwissColors.inkPrimary,
+                                borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
                                 'CIVITAS GATE',
                                 style: SwissTheme.mono(
-                                    size: 9, color: SwissColors.white),
+                                    size: 9,
+                                    weight: FontWeight.w700,
+                                    color: SwissColors.canvasPure),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 titleText,
-                                style: SwissTheme.display(size: 15),
+                                style: SwissTheme.display(
+                                    size: 16,
+                                    weight: FontWeight.w800,
+                                    color: SwissColors.inkPrimary),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           'Universitas Putra Indonesia "YPTK" Padang',
-                          style:
-                              SwissTheme.sans(size: 11, color: SwissColors.zinc500),
+                          style: SwissTheme.sans(
+                              size: 11, color: SwissColors.inkSecondary),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const Icon(Icons.close, size: 18, color: SwissColors.inkSecondary),
                   ),
                 ],
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1),
+                child: Divider(height: 1, color: SwissColors.borderHairline),
               ),
 
-              // Tab Switcher
+              // Tab Switcher (Full Pill)
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: SwissColors.zinc100,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: SwissColors.zinc200),
+                  color: SwissColors.canvasSubtle,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: SwissColors.borderHairline),
                 ),
                 child: Row(
                   children: [
@@ -1520,23 +1729,23 @@ class _AuthDialogState extends State<_AuthDialog> {
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
               if (_errorMsg != null) ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: SwissColors.rose50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: SwissColors.rose200),
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFFECACA)),
                   ),
                   child: Text(
                     _errorMsg!,
                     style: SwissTheme.sans(
                         size: 11,
                         weight: FontWeight.w600,
-                        color: SwissColors.rose700),
+                        color: const Color(0xFFDC2626)),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1560,13 +1769,22 @@ class _AuthDialogState extends State<_AuthDialog> {
           _tab = key;
           _errorMsg = null;
         }),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(999),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: active ? SwissColors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
+            color: active ? SwissColors.canvasPure : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: active
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    )
+                  ]
+                : null,
           ),
           child: Text(
             label,
@@ -1575,7 +1793,7 @@ class _AuthDialogState extends State<_AuthDialog> {
             style: SwissTheme.sans(
               size: 11,
               weight: active ? FontWeight.w700 : FontWeight.w600,
-              color: active ? SwissColors.zinc950 : SwissColors.zinc500,
+              color: active ? SwissColors.inkPrimary : SwissColors.inkSecondary,
             ),
           ),
         ),
@@ -1590,7 +1808,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         _fieldLabel('NIM ATAU USERNAME *'),
         TextField(
           controller: _loginIdCtrl,
-          style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+          style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration('24101152610172 atau iqbal_m / admin'),
         ),
         const SizedBox(height: 12),
@@ -1605,7 +1823,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                 style: SwissTheme.mono(
                     size: 10,
                     weight: FontWeight.w700,
-                    color: SwissColors.indigo600),
+                    color: SwissColors.escrowIndigo),
               ),
             ),
           ],
@@ -1613,7 +1831,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         TextField(
           controller: _loginPassCtrl,
           obscureText: true,
-          style: SwissTheme.sans(size: 12),
+          style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration('•••••••• (Demo: password)'),
         ),
         const SizedBox(height: 12),
@@ -1621,11 +1839,11 @@ class _AuthDialogState extends State<_AuthDialog> {
         // Quick Demo Account Chips
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: SwissColors.zinc50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: SwissColors.zinc200),
+            color: SwissColors.canvasSubtle,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: SwissColors.borderHairline),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1635,9 +1853,9 @@ class _AuthDialogState extends State<_AuthDialog> {
                 style: SwissTheme.mono(
                     size: 9,
                     weight: FontWeight.w700,
-                    color: SwissColors.zinc700),
+                    color: SwissColors.inkSecondary),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -1650,25 +1868,26 @@ class _AuthDialogState extends State<_AuthDialog> {
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _handleLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: SwissColors.zinc950,
-              foregroundColor: SwissColors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
+              backgroundColor: SwissColors.rauschCoral,
+              foregroundColor: SwissColors.canvasPure,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(999),
               ),
             ),
             child: Text(
               'Masuk ke Portal',
               style: SwissTheme.sans(
-                size: 12,
-                weight: FontWeight.w600,
-                color: SwissColors.white,
+                size: 13,
+                weight: FontWeight.w700,
+                color: SwissColors.canvasPure,
               ),
             ),
           ),
@@ -1685,17 +1904,17 @@ class _AuthDialogState extends State<_AuthDialog> {
           _loginPassCtrl.text = 'password';
         });
       },
-      borderRadius: BorderRadius.circular(5),
+      borderRadius: BorderRadius.circular(999),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: SwissColors.white,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: SwissColors.zinc300),
+          color: SwissColors.canvasPure,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: SwissColors.borderHairline),
         ),
         child: Text(
           label,
-          style: SwissTheme.mono(size: 9, color: SwissColors.zinc800),
+          style: SwissTheme.mono(size: 9, weight: FontWeight.w600, color: SwissColors.inkPrimary),
         ),
       ),
     );
@@ -1706,11 +1925,11 @@ class _AuthDialogState extends State<_AuthDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: SwissColors.zinc50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: SwissColors.zinc200),
+            color: const Color(0xFFF0FDF4),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFBBF7D0)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1720,12 +1939,12 @@ class _AuthDialogState extends State<_AuthDialog> {
                 style: SwissTheme.mono(
                     size: 10,
                     weight: FontWeight.w700,
-                    color: SwissColors.indigo600),
+                    color: SwissColors.verifiedEmerald),
               ),
               const SizedBox(height: 2),
               Text(
                 'Setiap pendaftar wajib menggunakan Username unik, 14 digit NIM resmi, dan mengunggah foto KTM / KRS aktif UPI YPTK untuk diverifikasi Admin.',
-                style: SwissTheme.sans(size: 11, color: SwissColors.zinc700),
+                style: SwissTheme.sans(size: 11, color: SwissColors.inkSecondary),
               ),
             ],
           ),
@@ -1740,7 +1959,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   _fieldLabel('USERNAME UNIK *'),
                   TextField(
                     controller: _regUsernameCtrl,
-                    style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+                    style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('iqbal_upi'),
                   ),
                 ],
@@ -1754,7 +1973,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   _fieldLabel('NIM MAHASISWA *'),
                   TextField(
                     controller: _regNimCtrl,
-                    style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+                    style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('24101152610177'),
                   ),
                 ],
@@ -1766,7 +1985,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         _fieldLabel('NAMA LENGKAP (SESUAI KTM) *'),
         TextField(
           controller: _regNamaCtrl,
-          style: SwissTheme.sans(size: 12),
+          style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration('Muhammad Iqbal Maulana'),
         ),
         const SizedBox(height: 10),
@@ -1774,7 +1993,7 @@ class _AuthDialogState extends State<_AuthDialog> {
         DropdownButtonFormField<String>(
           initialValue: _regJurusan,
           isExpanded: true,
-          style: SwissTheme.sans(size: 12),
+          style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration(''),
           items: _prodiList
               .map((p) => DropdownMenuItem(value: p, child: Text(p)))
@@ -1793,7 +2012,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   _fieldLabel('NO. WHATSAPP AKTIF *'),
                   TextField(
                     controller: _regWaCtrl,
-                    style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+                    style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('081234567890'),
                   ),
                 ],
@@ -1808,7 +2027,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   TextField(
                     controller: _regPassCtrl,
                     obscureText: true,
-                    style: SwissTheme.sans(size: 12),
+                    style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('Min. 6 karakter'),
                   ),
                 ],
@@ -1818,11 +2037,11 @@ class _AuthDialogState extends State<_AuthDialog> {
         ),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: SwissColors.zinc50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: SwissColors.zinc200),
+            color: SwissColors.canvasSubtle,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: SwissColors.borderHairline),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1836,44 +2055,54 @@ class _AuthDialogState extends State<_AuthDialog> {
                       style: SwissTheme.mono(
                           size: 10,
                           weight: FontWeight.w700,
-                          color: SwissColors.zinc900),
+                          color: SwissColors.inkPrimary),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       _ktmAttached
                           ? '✓ Berkas: sample_ktm_upi_yptk.jpg siap diunggah'
                           : 'Belum ada berkas dipilih',
                       style: SwissTheme.sans(
-                          size: 11, color: SwissColors.emerald700),
+                          size: 11,
+                          weight: _ktmAttached ? FontWeight.w600 : FontWeight.w400,
+                          color: _ktmAttached ? SwissColors.verifiedEmerald : SwissColors.inkSecondary),
                     ),
                   ],
                 ),
               ),
               OutlinedButton(
                 onPressed: () => setState(() => _ktmAttached = true),
-                child: Text('Pilih KTM', style: SwissTheme.mono(size: 10)),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  side: const BorderSide(color: SwissColors.borderHairline),
+                ),
+                child: Text('Pilih KTM', style: SwissTheme.mono(size: 10, weight: FontWeight.w600, color: SwissColors.inkPrimary)),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _handleRegister,
             style: ElevatedButton.styleFrom(
-              backgroundColor: SwissColors.zinc950,
-              foregroundColor: SwissColors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
+              backgroundColor: SwissColors.rauschCoral,
+              foregroundColor: SwissColors.canvasPure,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(999),
               ),
             ),
             child: Text(
               'Ajukan Verifikasi Akun',
               style: SwissTheme.sans(
-                size: 12,
-                weight: FontWeight.w600,
-                color: SwissColors.white,
+                size: 13,
+                weight: FontWeight.w700,
+                color: SwissColors.canvasPure,
               ),
             ),
           ),
@@ -1887,11 +2116,11 @@ class _AuthDialogState extends State<_AuthDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: SwissColors.zinc50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: SwissColors.zinc200),
+            color: const Color(0xFFEEF2FF),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFC7D2FE)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1901,12 +2130,12 @@ class _AuthDialogState extends State<_AuthDialog> {
                 style: SwissTheme.mono(
                     size: 10,
                     weight: FontWeight.w700,
-                    color: SwissColors.indigo600),
+                    color: SwissColors.escrowIndigo),
               ),
               const SizedBox(height: 2),
               Text(
                 'Masukkan 14 digit NIM dan Nomor WhatsApp yang terdaftar pada akun Anda untuk membuat kata sandi baru.',
-                style: SwissTheme.sans(size: 11, color: SwissColors.zinc700),
+                style: SwissTheme.sans(size: 11, color: SwissColors.inkSecondary),
               ),
             ],
           ),
@@ -1915,14 +2144,14 @@ class _AuthDialogState extends State<_AuthDialog> {
         _fieldLabel('NIM MAHASISWA *'),
         TextField(
           controller: _forgotNimCtrl,
-          style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+          style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration('24101152610172'),
         ),
         const SizedBox(height: 10),
         _fieldLabel('NOMOR WHATSAPP TERDAFTAR *'),
         TextField(
           controller: _forgotWaCtrl,
-          style: SwissTheme.mono(size: 12, color: SwissColors.zinc900),
+          style: SwissTheme.mono(size: 12, color: SwissColors.inkPrimary),
           decoration: _inputDecoration('081234567890'),
         ),
         const SizedBox(height: 10),
@@ -1936,7 +2165,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   TextField(
                     controller: _forgotNewPassCtrl,
                     obscureText: true,
-                    style: SwissTheme.sans(size: 12),
+                    style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('Min. 6 karakter'),
                   ),
                 ],
@@ -1951,7 +2180,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   TextField(
                     controller: _forgotConfirmPassCtrl,
                     obscureText: true,
-                    style: SwissTheme.sans(size: 12),
+                    style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
                     decoration: _inputDecoration('Ulangi sandi'),
                   ),
                 ],
@@ -1959,25 +2188,26 @@ class _AuthDialogState extends State<_AuthDialog> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _handleForgot,
             style: ElevatedButton.styleFrom(
-              backgroundColor: SwissColors.zinc950,
-              foregroundColor: SwissColors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
+              backgroundColor: SwissColors.rauschCoral,
+              foregroundColor: SwissColors.canvasPure,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(999),
               ),
             ),
             child: Text(
               'Perbarui Kata Sandi',
               style: SwissTheme.sans(
-                size: 12,
-                weight: FontWeight.w600,
-                color: SwissColors.white,
+                size: 13,
+                weight: FontWeight.w700,
+                color: SwissColors.canvasPure,
               ),
             ),
           ),
@@ -1995,7 +2225,7 @@ Widget _fieldLabel(String text) {
       style: SwissTheme.mono(
         size: 10,
         weight: FontWeight.w600,
-        color: SwissColors.zinc600,
+        color: SwissColors.inkSecondary,
       ),
     ),
   );
@@ -2004,22 +2234,22 @@ Widget _fieldLabel(String text) {
 InputDecoration _inputDecoration(String hint) {
   return InputDecoration(
     hintText: hint,
-    hintStyle: SwissTheme.sans(size: 12, color: SwissColors.zinc400),
+    hintStyle: SwissTheme.sans(size: 12, color: SwissColors.inkMuted),
     isDense: true,
     filled: true,
-    fillColor: SwissColors.white,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    fillColor: SwissColors.canvasPure,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: SwissColors.zinc300),
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: SwissColors.borderHairline),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: SwissColors.zinc300),
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: SwissColors.borderHairline),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: SwissColors.zinc950, width: 1.5),
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: SwissColors.inkPrimary, width: 1.5),
     ),
   );
 }
