@@ -31,6 +31,8 @@ class CampusTradeState extends ChangeNotifier {
   String selectedCategory = 'Semua';
   String searchKeyword = '';
   String selectedRadiusKm = 'all'; // 'all', '0.5', '1', '2'
+  String sortOption = 'terbaru'; // 'terbaru', 'termurah', 'termahal', 'terdekat'
+  final Set<int> favoriteProductIds = {1, 3};
   bool isMainMapExpanded = false;
 
   // Filter Admin CMS - Products
@@ -57,10 +59,10 @@ class CampusTradeState extends ChangeNotifier {
     'biaya_handling_berat': '10000',
     'nama_bank': 'Bank Nagari / BSI / DANA',
     'nomor_rekening': '2100.0210.88888-9',
-    'atas_nama_rekening': 'CampusTrade UPI YPTK Padang',
+    'atas_nama_rekening': 'CampusTrade Indonesia',
     'no_wa_admin': '6281234567899',
     'banner_pengumuman':
-        'Oper perabotan kos mahasiswa UPI YPTK Padang aman, terverifikasi KTM, dan bebas penipuan!',
+        'CampusTrade — Platform bursa inventaris kos mahasiswa terpercaya (Zona Target: Kampus UPI YPTK Padang & Lubeg).',
   };
 
   late final List<UserModel> users;
@@ -121,8 +123,8 @@ class CampusTradeState extends ChangeNotifier {
         id: 4,
         username: 'admin',
         nim: 'admin',
-        nama: 'Tim Admin & Verifikator UPI YPTK',
-        jurusan: 'Pusat Layanan Mahasiswa',
+        nama: 'Tim Verifikator CampusTrade',
+        jurusan: 'Operasional Platform CampusTrade',
         whatsapp: '6281234567899',
         password: 'password',
         fotoKtm: null,
@@ -548,10 +550,27 @@ class CampusTradeState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSortOption(String option) {
+    sortOption = option;
+    notifyListeners();
+  }
+
+  bool isFavorite(int productId) => favoriteProductIds.contains(productId);
+
+  void toggleFavorite(int productId) {
+    if (favoriteProductIds.contains(productId)) {
+      favoriteProductIds.remove(productId);
+    } else {
+      favoriteProductIds.add(productId);
+    }
+    notifyListeners();
+  }
+
   void resetAllFilters() {
     selectedCategory = 'Semua';
     searchKeyword = '';
     selectedRadiusKm = 'all';
+    sortOption = 'terbaru';
     notifyListeners();
   }
 
@@ -564,7 +583,7 @@ class CampusTradeState extends ChangeNotifier {
         ? 999.0
         : (double.tryParse(selectedRadiusKm) ?? 999.0);
 
-    return products.where((p) {
+    final list = products.where((p) {
       if (p.statusVerifikasi != 'approved') return false;
 
       // Category match
@@ -585,8 +604,25 @@ class CampusTradeState extends ChangeNotifier {
       final bool matchesRadius = p.distanceToCampusKm <= maxDist;
 
       return matchesCategory && matchesSearch && matchesRadius;
-    }).toList()
-      ..sort((a, b) => b.id.compareTo(a.id));
+    }).toList();
+
+    switch (sortOption) {
+      case 'termurah':
+        list.sort((a, b) => a.harga.compareTo(b.harga));
+        break;
+      case 'termahal':
+        list.sort((a, b) => b.harga.compareTo(a.harga));
+        break;
+      case 'terdekat':
+        list.sort((a, b) => a.distanceToCampusKm.compareTo(b.distanceToCampusKm));
+        break;
+      case 'terbaru':
+      default:
+        list.sort((a, b) => b.id.compareTo(a.id));
+        break;
+    }
+
+    return list;
   }
 
   // ===========================================================================
@@ -659,18 +695,18 @@ class CampusTradeState extends ChangeNotifier {
       currentAdminTab = 'dashboard';
     } else if (matched.statusVerifikasi == 'pending') {
       flashWarning =
-          'Akun Anda (@${matched.username}) sedang MENUNGGU VERIFIKASI kartu KTM/KRS oleh Admin UPI YPTK. Fitur pasang iklan & transaksi baru aktif setelah disetujui.';
+          'Akun Anda (@${matched.username}) sedang MENUNGGU VERIFIKASI kartu identitas mahasiswa oleh Tim Verifikator CampusTrade (Target: UPI YPTK). Fitur pasang iklan aktif setelah disetujui.';
       currentRoute = 'catalog';
     } else if (matched.statusVerifikasi == 'rejected') {
       final String alasan = (matched.catatanPenolakan?.isNotEmpty ?? false)
           ? matched.catatanPenolakan!
-          : 'Foto KTM/KRS buram atau data NIM tidak sesuai';
+          : 'Foto KTM buram atau data NIM tidak sesuai';
       flashError =
-          "Pendaftaran akun (@${matched.username}) DITOLAK oleh Admin. Alasan: '$alasan'. Silakan hubungi admin untuk verifikasi ulang.";
+          "Pendaftaran akun (@${matched.username}) DITOLAK oleh Tim Verifikator CampusTrade. Alasan: '$alasan'. Silakan hubungi admin untuk verifikasi ulang.";
       currentRoute = 'catalog';
     } else {
       flashSuccess =
-          'Selamat datang, ${matched.nama} (@${matched.username})! Akun terverifikasi resmi mahasiswa UPI YPTK.';
+          'Selamat datang, ${matched.nama} (@${matched.username}) di Platform CampusTrade!';
       currentRoute = 'catalog';
     }
 
@@ -749,7 +785,7 @@ class CampusTradeState extends ChangeNotifier {
     users.add(newUser);
     currentUser = newUser;
     flashWarning =
-        'Pendaftaran berhasil! Akun @$uClean sedang menunggu verifikasi berkas KTM/KRS oleh Admin UPI YPTK.';
+        'Pendaftaran berhasil! Akun @$uClean sedang menunggu verifikasi berkas KTM oleh Tim Verifikator CampusTrade (Target: UPI YPTK).';
     notifyListeners();
     return null;
   }
@@ -846,6 +882,7 @@ class CampusTradeState extends ChangeNotifier {
     required String namaBarang,
     required String kategori,
     required int harga,
+    int? hargaAsli,
     required String kondisi,
     required String metodePengiriman,
     required String titikCod,
@@ -884,7 +921,7 @@ class CampusTradeState extends ChangeNotifier {
       namaBarang: namaBarang.trim(),
       kategori: kategori,
       harga: harga,
-      hargaAsli: (harga * 1.5).round(),
+      hargaAsli: hargaAsli != null && hargaAsli > harga ? hargaAsli : (harga * 1.5).round(),
       kondisi: kondisi,
       lokasiKos: lokasiKos.trim(),
       titikCod: titikCod,
