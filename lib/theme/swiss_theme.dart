@@ -25,19 +25,22 @@ class SwissColors {
   static const Color uberGrayInactive = Color(0xFFF3F4F6);
   static const Color uberBorder = Color(0xFFE5E7EB);
 
-  // --- TRACK C: FINTECH ESCROW & ADMIN CMS (STRIPE × LINEAR DARK MODE) ---
+  // --- TRACK C: FINTECH ESCROW & ADMIN CMS (PRO SLATE × INDIGO CONSOLE) ---
   static const Color escrowIndigo = Color(0xFF635BFF); // Stripe Escrow Indigo
   static const Color escrowBg = Color(0xFFF8FAFC);
   static const Color escrowBorder = Color(0xFFE2E8F0);
 
-  // Linear Dark Console Tokens
-  static const Color adminVoid = Color(0xFF0B0C10); // Main canvas
-  static const Color adminPanel = Color(0xFF12141C); // Bento cards, sidebar, table rows
-  static const Color adminElevated = Color(0xFF1A1D28); // Hover, active item, toolbar
-  static const Color adminHairline = Color(0xFF222634); // 1px borders
-  static const Color adminTextHigh = Color(0xFFF7F8F8); // Primary high-contrast text
-  static const Color adminTextLow = Color(0xFF8A8F98); // Secondary text, headers
-  static const Color linearLavender = Color(0xFF5E6AD2); // Lavender accent
+  // Modern Executive Console Tokens (Deep Midnight Slate & Vibrant Accents)
+  static const Color adminVoid = Color(0xFF0A0E1A); // Rich deep midnight slate canvas
+  static const Color adminPanel = Color(0xFF111827); // Rich slate 900 panel & sidebar
+  static const Color adminElevated = Color(0xFF1E293B); // Slate 800 hover, active, toolbar & inputs
+  static const Color adminHairline = Color(0xFF28354D); // Crisp 1px borders
+  static const Color adminTextHigh = Color(0xFFF8FAFC); // High-contrast crisp white text
+  static const Color adminTextLow = Color(0xFF94A3B8); // Clear readable slate 400 text
+  static const Color linearLavender = Color(0xFF6366F1); // Electric Indigo primary accent
+  static const Color adminAccentCyan = Color(0xFF0EA5E9); // Modern telemetry cyan
+  static const Color adminAccentEmerald = Color(0xFF10B981); // Active status emerald
+  static const Color adminAccentAmber = Color(0xFFF59E0B); // Pending status amber
 
   // Existing Swiss Legacy Compatibility Tokens
   static const Color surface = Color(0xFFFAFAFA);

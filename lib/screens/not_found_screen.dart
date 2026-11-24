@@ -53,9 +53,9 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: SwissColors.dangerRose.withOpacity(0.08),
+                      color: SwissColors.dangerRose.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: SwissColors.dangerRose.withOpacity(0.2)),
+                      border: Border.all(color: SwissColors.dangerRose.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -88,7 +88,7 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tautan yang Anda akses kemungkinan telah ditarik dari katalog karena unit sudah terjual, atau alamat URL tidak terdaftar pada server CampusTrade UPI YPTK.',
+                    'Tautan yang Anda akses kemungkinan telah ditarik dari katalog karena unit sudah terjual, atau alamat URL tidak terdaftar pada platform CampusTrade.',
                     style: SwissTheme.sans(
                         size: 12, color: SwissColors.inkSecondary, height: 1.5),
                   ),
@@ -96,24 +96,28 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _searchCtrl,
-                          style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
-                          decoration: InputDecoration(
-                            hintText: 'Cari kasur, dispenser, meja lipat...',
-                            hintStyle: SwissTheme.sans(size: 12, color: SwissColors.inkMuted),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 12),
-                            filled: true,
-                            fillColor: SwissColors.canvasWarm,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(999),
-                              borderSide: const BorderSide(color: SwissColors.borderHairline),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(999),
-                              borderSide: const BorderSide(color: SwissColors.inkPrimary, width: 1.5),
+                        child: SizedBox(
+                          height: 44,
+                          child: TextField(
+                            controller: _searchCtrl,
+                            textAlignVertical: TextAlignVertical.center,
+                            style: SwissTheme.sans(size: 12, color: SwissColors.inkPrimary),
+                            decoration: InputDecoration(
+                              hintText: 'Cari kasur, dispenser, meja lipat...',
+                              hintStyle: SwissTheme.sans(size: 12, color: SwissColors.inkMuted),
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 0),
+                              filled: true,
+                              fillColor: SwissColors.canvasWarm,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(999),
+                                borderSide: const BorderSide(color: SwissColors.borderHairline),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(999),
+                                borderSide: const BorderSide(color: SwissColors.inkPrimary, width: 1.5),
+                              ),
                             ),
                           ),
                         ),
@@ -167,7 +171,7 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
                     spacing: 8,
                     runSpacing: 4,
                     children: [
-                      Text('CAMPUSTRADE // UPI YPTK',
+                      Text('CAMPUSTRADE // BURSA MAHASISWA',
                           style: SwissTheme.mono(
                               size: 10, color: SwissColors.inkMuted)),
                       Text('HARDENED SERVER',

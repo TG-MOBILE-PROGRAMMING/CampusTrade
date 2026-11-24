@@ -42,15 +42,15 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
   String get _currentTabSubtitle {
     switch (widget.appState.currentAdminTab) {
       case 'products':
-        return 'Manajemen Kurasi & Quality Control Unit Kos';
+        return 'Kurasi & Quality Control Inventaris Kos (Platform CampusTrade)';
       case 'users':
-        return 'Validasi Identitas Mahasiswa Kampus UPI YPTK';
+        return 'Verifikasi Berkas KTM/KRS Mahasiswa (Platform CampusTrade)';
       case 'cod_spots':
-        return 'Pemetaan Titik Temu Transaksi Aman Lubuk Begalung';
+        return 'Pemetaan Titik Temu Transaksi Aman Mahasiswa Sekitar Kampus Target';
       case 'settings':
-        return 'Konfigurasi Parameter Biaya, Ongkir & Rekber';
+        return 'Konfigurasi Parameter Fee Verifikasi, Ongkir & Rekber CampusTrade';
       default:
-        return 'Telemetri Real-Time & Analitik Ekosistem Kampus';
+        return 'Telemetri Real-Time & Aktivitas Platform CampusTrade';
     }
   }
 
@@ -66,22 +66,33 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
           ? null
           : Drawer(
               backgroundColor: SwissColors.adminPanel,
+              clipBehavior: Clip.antiAlias,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.horizontal(right: Radius.circular(16)),
+              ),
               child: SafeArea(
+                top: true,
+                bottom: true,
                 child: _buildSidebar(isDrawer: true),
               ),
             ),
       body: SafeArea(
+        top: true,
+        bottom: true,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (isDesktop)
-              Container(
+              SizedBox(
                 width: 256,
-                decoration: const BoxDecoration(
-                  color: SwissColors.adminPanel,
-                  border: Border(right: BorderSide(color: SwissColors.adminHairline)),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: SwissColors.adminPanel,
+                    border: Border(right: BorderSide(color: SwissColors.adminHairline)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: _buildSidebar(),
                 ),
-                child: _buildSidebar(),
               ),
             Expanded(
               child: Column(
@@ -121,75 +132,88 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
               border: Border(bottom: BorderSide(color: SwissColors.adminHairline)),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                InkWell(
-                  onTap: () {
-                    if (isDrawer) Navigator.pop(context);
-                    s.setAdminTab('dashboard');
-                  },
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: SwissColors.linearLavender,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x335E6AD2),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'CT',
-                          style: SwissTheme.display(
-                              size: 13, color: SwissColors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'CampusTrade',
-                                style: SwissTheme.display(
-                                    size: 14, color: SwissColors.adminTextHigh),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1.5),
-                                decoration: BoxDecoration(
-                                  color: SwissColors.adminElevated,
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: SwissColors.adminHairline),
-                                ),
-                                child: Text(
-                                  'CMS',
-                                  style: SwissTheme.mono(
-                                      size: 9,
-                                      weight: FontWeight.w700,
-                                      color: SwissColors.linearLavender),
-                                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      if (isDrawer) Navigator.pop(context);
+                      s.setAdminTab('dashboard');
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: SwissColors.linearLavender,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x336366F1),
+                                blurRadius: 10,
+                                offset: Offset(0, 3),
                               ),
                             ],
                           ),
-                          Text(
-                            'UPI YPTK PADANG',
-                            style: SwissTheme.mono(
-                                size: 9, color: SwissColors.adminTextLow),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'CT',
+                            style: SwissTheme.display(
+                                size: 14, weight: FontWeight.w800, color: SwissColors.white),
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      'CampusTrade',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: SwissTheme.display(
+                                          size: 14, weight: FontWeight.w800, color: SwissColors.adminTextHigh),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: SwissColors.linearLavender.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: SwissColors.linearLavender.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Text(
+                                      'CMS',
+                                      style: SwissTheme.mono(
+                                          size: 8,
+                                          weight: FontWeight.w800,
+                                          color: SwissColors.linearLavender),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'PLATFORM PENGHUBUNG KAMPUS',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: SwissTheme.mono(
+                                    size: 8, weight: FontWeight.w600, color: SwissColors.adminTextLow),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 if (isDrawer)
@@ -206,6 +230,7 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
           // Navigation Menu
           Expanded(
             child: ListView(
+              physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               children: [
                 Padding(
@@ -290,7 +315,7 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
 
           // Admin Profile Footer
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: const BoxDecoration(
               color: SwissColors.adminPanel,
               border: Border(top: BorderSide(color: SwissColors.adminHairline)),
@@ -298,38 +323,39 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
             child: Row(
               children: [
                 Container(
-                  width: 34,
-                  height: 34,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: SwissColors.adminElevated,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: SwissColors.adminHairline),
+                    color: SwissColors.linearLavender.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: SwissColors.linearLavender.withValues(alpha: 0.3)),
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    'AD',
-                    style: SwissTheme.mono(
-                        size: 11,
-                        weight: FontWeight.w700,
-                        color: SwissColors.linearLavender),
+                  child: const Text(
+                    'CT',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: SwissColors.linearLavender,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        s.currentUser?.nama ??
-                            'Tim Admin & Verifikator UPI YPTK',
+                        'Tim Verifikator CampusTrade',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SwissTheme.sans(
                           size: 12,
-                          weight: FontWeight.w600,
+                          weight: FontWeight.w700,
                           color: SwissColors.adminTextHigh,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Row(
                         children: [
                           Text(
@@ -340,18 +366,17 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 1),
+                                horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: const Color(0x1F059669),
-                              borderRadius: BorderRadius.circular(3),
-                              border: Border.all(color: const Color(0x33059669)),
+                              color: SwissColors.adminAccentEmerald.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              'ONLINE',
+                              'AKTIF',
                               style: SwissTheme.mono(
                                   size: 8,
-                                  weight: FontWeight.w700,
-                                  color: SwissColors.verifiedEmerald),
+                                  weight: FontWeight.w800,
+                                  color: SwissColors.adminAccentEmerald),
                             ),
                           ),
                         ],
@@ -382,30 +407,33 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
           widget.appState.setAdminTab(tab);
           if (isDrawer) Navigator.pop(context);
         },
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: active ? SwissColors.adminElevated : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: active
+                ? SwissColors.linearLavender.withValues(alpha: 0.15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
             border: active
-                ? Border.all(color: SwissColors.adminHairline)
-                : null,
+                ? Border.all(
+                    color: SwissColors.linearLavender.withValues(alpha: 0.35))
+                : Border.all(color: Colors.transparent),
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                size: 16,
+                size: 18,
                 color: active ? SwissColors.linearLavender : SwissColors.adminTextLow,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   label,
                   style: SwissTheme.sans(
                     size: 12,
-                    weight: active ? FontWeight.w600 : FontWeight.w500,
+                    weight: active ? FontWeight.w700 : FontWeight.w500,
                     color: active ? SwissColors.adminTextHigh : SwissColors.adminTextLow,
                   ),
                 ),
@@ -413,10 +441,10 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
               if (badgeCount > 0)
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
                     color: active ? SwissColors.linearLavender : SwissColors.adminElevated,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: SwissColors.adminHairline),
                   ),
                   child: Text(
@@ -445,13 +473,13 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
       padding: const EdgeInsets.only(bottom: 4),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
-              Icon(icon, size: 16, color: color),
-              const SizedBox(width: 10),
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   label,
@@ -462,8 +490,8 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   ),
                 ),
               ),
-              Icon(Icons.arrow_forward,
-                  size: 12, color: color.withOpacity(0.4)),
+              Icon(Icons.arrow_forward_ios,
+                  size: 11, color: color.withValues(alpha: 0.5)),
             ],
           ),
         ),
@@ -553,7 +581,7 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
             children: [
               if (isDesktop) ...[
                 Text(
-                  'PADANG // UPI YPTK',
+                  'PLATFORM PENGHUBUNG KAMPUS',
                   style: SwissTheme.mono(size: 10, color: SwissColors.adminTextLow),
                 ),
                 const SizedBox(width: 14),
@@ -1388,7 +1416,7 @@ class _AdminDashboardView extends StatelessWidget {
                         size: 14,
                         color: SwissColors.adminTextHigh,
                       )),
-                  Text('UPI YPTK',
+                  Text('ZONA KAMPUS TARGET',
                       style: SwissTheme.mono(
                           size: 10, color: SwissColors.adminTextLow)),
                 ],
@@ -1726,10 +1754,10 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
 
         // Search & Category Filter Bar
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: SwissColors.adminPanel,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: SwissColors.adminHairline),
           ),
           child: LayoutBuilder(
@@ -1737,7 +1765,7 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
               final bool isWide = constraints.maxWidth >= 640;
 
               final Widget searchField = SizedBox(
-                height: 42,
+                height: 44,
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: (v) => setState(() => s.adminProductSearch = v),
@@ -1747,46 +1775,53 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                     hintText:
                         'Cari nama barang, penjual, NIM, atau lokasi kos...',
                     hintStyle: SwissTheme.sans(
-                        size: 11, color: SwissColors.adminTextLow),
+                        size: 12, color: SwissColors.adminTextLow),
                     isDense: true,
                     filled: true,
                     fillColor: SwissColors.adminElevated,
                     prefixIcon: const Icon(Icons.search,
-                        size: 16, color: SwissColors.adminTextLow),
+                        size: 18, color: SwissColors.adminTextLow),
                     prefixIconConstraints:
-                        const BoxConstraints(minWidth: 36, minHeight: 42),
+                        const BoxConstraints(minWidth: 44, minHeight: 44),
                     suffixIcon: _searchCtrl.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close,
-                                size: 14, color: SwissColors.adminTextLow),
-                            onPressed: () {
-                              _searchCtrl.clear();
-                              setState(() => s.adminProductSearch = '');
-                            },
+                        ? SizedBox(
+                            width: 40,
+                            height: 44,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: const Icon(Icons.close,
+                                  size: 16, color: SwissColors.adminTextLow),
+                              onPressed: () {
+                                _searchCtrl.clear();
+                                setState(() => s.adminProductSearch = '');
+                              },
+                            ),
                           )
                         : null,
+                    suffixIconConstraints:
+                        const BoxConstraints(minWidth: 40, minHeight: 44),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 0),
+                        horizontal: 14, vertical: 0),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide:
                           const BorderSide(color: SwissColors.adminHairline),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(
-                          color: SwissColors.linearLavender, width: 1.2),
+                          color: SwissColors.linearLavender, width: 1.5),
                     ),
                   ),
                 ),
               );
 
               final Widget categoryDropdown = Container(
-                height: 42,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: SwissColors.adminElevated,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: SwissColors.adminHairline),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -1797,8 +1832,7 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                         size: 12, color: SwissColors.adminTextHigh),
                     icon: const Icon(Icons.keyboard_arrow_down,
                         size: 18, color: SwissColors.adminTextLow),
-                    isDense: true,
-                    isExpanded: !isWide,
+                    isExpanded: true,
                     items: const [
                       DropdownMenuItem(
                           value: 'all', child: Text('Semua Kategori')),
@@ -1824,41 +1858,45 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                 ),
               );
 
+              final bool hasFilter = s.adminProductSearch.isNotEmpty ||
+                  s.adminProductCategoryFilter != 'all';
+
+              final Widget resetBtn = Tooltip(
+                message: 'Reset Pencarian & Filter',
+                child: InkWell(
+                  onTap: () {
+                    _searchCtrl.clear();
+                    setState(() {
+                      s.adminProductSearch = '';
+                      s.adminProductCategoryFilter = 'all';
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    height: 44,
+                    width: 44,
+                    decoration: BoxDecoration(
+                      color: SwissColors.adminElevated,
+                      borderRadius: BorderRadius.circular(10),
+                      border:
+                          Border.all(color: SwissColors.adminHairline),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.refresh,
+                        size: 18, color: SwissColors.linearLavender),
+                  ),
+                ),
+              );
+
               if (isWide) {
                 return Row(
                   children: [
                     Expanded(child: searchField),
-                    const SizedBox(width: 10),
-                    SizedBox(width: 220, child: categoryDropdown),
-                    if (s.adminProductSearch.isNotEmpty ||
-                        s.adminProductCategoryFilter != 'all') ...[
-                      const SizedBox(width: 8),
-                      Tooltip(
-                        message: 'Reset Pencarian & Filter',
-                        child: InkWell(
-                          onTap: () {
-                            _searchCtrl.clear();
-                            setState(() {
-                              s.adminProductSearch = '';
-                              s.adminProductCategoryFilter = 'all';
-                            });
-                          },
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            height: 42,
-                            width: 42,
-                            decoration: BoxDecoration(
-                              color: SwissColors.adminElevated,
-                              borderRadius: BorderRadius.circular(8),
-                              border:
-                                  Border.all(color: SwissColors.adminHairline),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.refresh,
-                                size: 16, color: SwissColors.linearLavender),
-                          ),
-                        ),
-                      ),
+                    const SizedBox(width: 12),
+                    SizedBox(width: 200, child: categoryDropdown),
+                    if (hasFilter) ...[
+                      const SizedBox(width: 10),
+                      resetBtn,
                     ],
                   ],
                 );
@@ -1869,7 +1907,15 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
                 children: [
                   searchField,
                   const SizedBox(height: 10),
-                  categoryDropdown,
+                  Row(
+                    children: [
+                      Expanded(child: categoryDropdown),
+                      if (hasFilter) ...[
+                        const SizedBox(width: 8),
+                        resetBtn,
+                      ],
+                    ],
+                  ),
                 ],
               );
             },
@@ -2627,17 +2673,17 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
 
         // Search Bar
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: SwissColors.adminPanel,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: SwissColors.adminHairline),
           ),
           child: Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 42,
+                  height: 44,
                   child: TextField(
                     controller: _searchCtrl,
                     onChanged: (v) => setState(() => s.adminUserSearch = v),
@@ -2648,42 +2694,54 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
                       hintText:
                           'Cari nama mahasiswa, username, NIM, atau jurusan...',
                       hintStyle: SwissTheme.sans(
-                          size: 11, color: SwissColors.adminTextLow),
+                          size: 12, color: SwissColors.adminTextLow),
                       isDense: true,
                       filled: true,
                       fillColor: SwissColors.adminElevated,
                       prefixIcon: const Icon(Icons.search,
-                          size: 16, color: SwissColors.adminTextLow),
+                          size: 18, color: SwissColors.adminTextLow),
                       prefixIconConstraints:
-                          const BoxConstraints(minWidth: 36, minHeight: 42),
+                          const BoxConstraints(minWidth: 44, minHeight: 44),
                       suffixIcon: _searchCtrl.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.close,
-                                  size: 14, color: SwissColors.adminTextLow),
-                              onPressed: () {
-                                _searchCtrl.clear();
-                                setState(() => s.adminUserSearch = '');
-                              },
+                          ? SizedBox(
+                              width: 40,
+                              height: 44,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.close,
+                                    size: 16, color: SwissColors.adminTextLow),
+                                onPressed: () {
+                                  _searchCtrl.clear();
+                                  setState(() => s.adminUserSearch = '');
+                                },
+                              ),
                             )
                           : null,
+                      suffixIconConstraints:
+                          const BoxConstraints(minWidth: 40, minHeight: 44),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 0),
+                          horizontal: 14, vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            const BorderSide(color: SwissColors.adminHairline),
+                      ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         borderSide:
                             const BorderSide(color: SwissColors.adminHairline),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(
-                            color: SwissColors.linearLavender, width: 1.2),
+                            color: SwissColors.linearLavender, width: 1.5),
                       ),
                     ),
                   ),
                 ),
               ),
               if (s.adminUserSearch.isNotEmpty) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Tooltip(
                   message: 'Reset Pencarian',
                   child: InkWell(
@@ -2691,18 +2749,19 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
                       _searchCtrl.clear();
                       setState(() => s.adminUserSearch = '');
                     },
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: Container(
-                      height: 42,
-                      width: 42,
+                      height: 44,
+                      width: 44,
                       decoration: BoxDecoration(
                         color: SwissColors.adminElevated,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: SwissColors.adminHairline),
+                        borderRadius: BorderRadius.circular(10),
+                        border:
+                            Border.all(color: SwissColors.adminHairline),
                       ),
                       alignment: Alignment.center,
                       child: const Icon(Icons.refresh,
-                          size: 16, color: SwissColors.linearLavender),
+                          size: 18, color: SwissColors.linearLavender),
                     ),
                   ),
                 ),
@@ -3410,7 +3469,7 @@ class _AdminSettingsViewState extends State<_AdminSettingsView> {
     _noWaCtrl = TextEditingController(text: p['no_wa_admin'] ?? '6281234567899');
     _bannerCtrl = TextEditingController(
         text: p['banner_pengumuman'] ??
-            'Bursa inventaris & perabotan kos mahasiswa UPI YPTK Padang.');
+            'Platform Bursa Inventaris & Perabotan Kos Mahasiswa CampusTrade (Penghubung Mahasiswa Kampus Target).');
   }
 
   @override
@@ -3650,7 +3709,7 @@ Widget _statusPill({
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: active ? activeColor.withOpacity(0.18) : SwissColors.adminElevated,
+        color: active ? activeColor.withValues(alpha: 0.18) : SwissColors.adminElevated,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: active ? activeColor : SwissColors.adminHairline,
@@ -3684,7 +3743,7 @@ Widget _statusBadge(String status) {
     decoration: BoxDecoration(
       color: bg,
       borderRadius: BorderRadius.circular(4),
-      border: Border.all(color: fg.withOpacity(0.3)),
+      border: Border.all(color: fg.withValues(alpha: 0.3)),
     ),
     child: Text(
       status.toUpperCase(),
