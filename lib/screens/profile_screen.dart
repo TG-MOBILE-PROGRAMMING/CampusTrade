@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
 import '../theme/swiss_theme.dart';
+import '../widgets/campus_empty_state.dart';
+import '../widgets/campus_motion.dart';
 import 'auth_screen.dart';
 import 'orders_screen.dart';
 import 'product_detail_screen.dart';
@@ -442,88 +444,140 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showWishlistSheet(List<ProductModel> wishlist) {
-    if (wishlist.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Belum ada barang di wishlist Anda. Klik ikon hati pada barang di katalog.')),
-      );
-      return;
-    }
-
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: SwissColors.canvasWarm,
+      buildCampusRoute(
+        Scaffold(
+          backgroundColor: CampusColors.canvasPaper,
           appBar: AppBar(
-            backgroundColor: SwissColors.canvasPure,
+            backgroundColor: CampusColors.surfacePure,
             elevation: 0,
-            title: Text('Wishlist / Barang Disimpan (${wishlist.length})', style: SwissTheme.display(size: 16)),
+            title: Text(
+              'Wishlist Saya (${wishlist.length})',
+              style: SwissTheme.display(size: 16),
+            ),
           ),
-          body: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: wishlist.length,
-            itemBuilder: (ctx, i) {
-              final p = wishlist[i];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: ListTile(
-                  title: Text(p.namaBarang, style: SwissTheme.display(size: 13, weight: FontWeight.w700)),
-                  subtitle: Text('${p.kategori} • ${SwissTheme.formatRupiah(p.harga)}'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProductDetailScreen(appState: widget.appState, product: p),
+          body: wishlist.isEmpty
+              ? Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 440),
+                      child: CampusEmptyState(
+                        kind: CampusEmptyKind.wishlistEmpty,
+                        title: 'Wishlist kamu masih kosong',
+                        subtitle:
+                            'Ketuk ikon hati di barang kos incaranmu biar tidak keburu diangkut mahasiswa lain.',
+                        primaryActionLabel: 'Cari Barang di Katalog',
+                        onPrimaryAction: () {
+                          Navigator.of(context).pop();
+                          widget.onBackToCatalog?.call();
+                        },
+                      ),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: wishlist.length,
+                  itemBuilder: (ctx, i) {
+                    final p = wishlist[i];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: ListTile(
+                        title: Text(
+                          p.namaBarang,
+                          style: SwissTheme.display(size: 13.5, weight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          '${p.kategori} • ${SwissTheme.formatRupiah(p.harga)}',
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            buildCampusRoute(
+                              ProductDetailScreen(
+                                appState: widget.appState,
+                                product: p,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
                 ),
-              );
-            },
-          ),
         ),
       ),
     );
   }
 
   void _showMyListingsSheet(List<ProductModel> listings) {
-    if (listings.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Anda belum memasang iklan barang. Klik "Pasang Iklan Barang Kos" untuk mulai.')),
-      );
-      return;
-    }
-
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: SwissColors.canvasWarm,
+      buildCampusRoute(
+        Scaffold(
+          backgroundColor: CampusColors.canvasPaper,
           appBar: AppBar(
-            backgroundColor: SwissColors.canvasPure,
+            backgroundColor: CampusColors.surfacePure,
             elevation: 0,
-            title: Text('Iklan Barang Saya (${listings.length})', style: SwissTheme.display(size: 16)),
+            title: Text(
+              'Iklan Barang Saya (${listings.length})',
+              style: SwissTheme.display(size: 16),
+            ),
           ),
-          body: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: listings.length,
-            itemBuilder: (ctx, i) {
-              final p = listings[i];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: ListTile(
-                  title: Text(p.namaBarang, style: SwissTheme.display(size: 13, weight: FontWeight.w700)),
-                  subtitle: Text('${p.kategori} • ${SwissTheme.formatRupiah(p.harga)} • Status: ${p.statusVerifikasi.toUpperCase()}'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProductDetailScreen(appState: widget.appState, product: p),
+          body: listings.isEmpty
+              ? Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 440),
+                      child: CampusEmptyState(
+                        kind: CampusEmptyKind.listingsEmpty,
+                        title: 'Kamar kos masih rapi, belum ada iklan',
+                        subtitle:
+                            'Punya kasur, meja lipat, atau buku semester lalu yang menganggur? Oper ke mahasiswa baru biar jadi uang jajan.',
+                        primaryActionLabel: 'Pasang Iklan Pertama',
+                        onPrimaryAction: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            buildCampusRoute(
+                              SellProductScreen(appState: widget.appState),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: listings.length,
+                  itemBuilder: (ctx, i) {
+                    final p = listings[i];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: ListTile(
+                        title: Text(
+                          p.namaBarang,
+                          style: SwissTheme.display(size: 13.5, weight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          '${p.kategori} • ${SwissTheme.formatRupiah(p.harga)} • Status: ${p.statusVerifikasi.toUpperCase()}',
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            buildCampusRoute(
+                              ProductDetailScreen(
+                                appState: widget.appState,
+                                product: p,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
                 ),
-              );
-            },
-          ),
         ),
       ),
     );

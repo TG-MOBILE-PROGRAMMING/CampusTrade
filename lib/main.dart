@@ -38,7 +38,7 @@ class _CampusTradeAppState extends State<CampusTradeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CampusTrade — Platform Penghubung Bursa Kos Mahasiswa (Target: UPI YPTK)',
+      title: 'CampusTrade: Bursa Inventaris Kos Mahasiswa (UPI YPTK Padang)',
       debugShowCheckedModeBanner: false,
       theme: SwissTheme.lightTheme,
       home: AnimatedBuilder(

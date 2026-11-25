@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
 import '../theme/swiss_theme.dart';
+import '../widgets/campus_bottom_nav.dart';
+import '../widgets/campus_empty_state.dart';
+import '../widgets/campus_motion.dart';
+import '../widgets/campus_trust_widgets.dart';
 import 'auth_screen.dart';
 import 'orders_screen.dart';
 import 'product_detail_screen.dart';
@@ -10,8 +14,9 @@ import 'radar_map_screen.dart';
 import 'sell_product_screen.dart';
 
 /// ============================================================================
-/// CATALOG SCREEN (CENTRAL MARKETPLACE EXPERIENCE FOR UPI YPTK PADANG)
-/// [Anti-Slop UI & Layoutmobile Architecture — Zero-Modal Proper Marketplace]
+/// CATALOG SCREEN (HOME SCREEN)
+/// "Coastal Cobalt & Sunburst Coral" + Smooth CustomScrollView & SliverAppBar
+/// + Animated Floating Pill Bottom Navigation
 /// ============================================================================
 class CatalogScreen extends StatefulWidget {
   final CampusTradeState appState;
@@ -22,51 +27,47 @@ class CatalogScreen extends StatefulWidget {
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
-  int _currentNavIndex = 0; // 0: Beranda, 1: Radar Kos, 2: Jual, 3: Pesanan, 4: Akun
+  int _currentNavIndex = 0; // 0: Katalog, 1: Radar, 3: Pesanan, 4: Akun
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  final PageController _bannerController = PageController();
-  int _activeBannerIndex = 0;
+  bool _isSearchFocused = false;
+  bool _showScrollToTop = false;
 
   static const List<Map<String, dynamic>> _categories = [
-    {'name': 'Semua', 'label': 'Semua Unit', 'icon': Icons.apps},
+    {'name': 'Semua', 'label': 'Semua', 'icon': Icons.grid_view_rounded},
     {'name': 'Perabotan Kos', 'label': 'Perabotan Kos', 'icon': Icons.bed_outlined},
     {'name': 'Elektronik Kos', 'label': 'Elektronik', 'icon': Icons.electrical_services_outlined},
     {'name': 'Gadget & Komputer', 'label': 'Gadget & PC', 'icon': Icons.laptop_chromebook_outlined},
     {'name': 'Buku & Modul Kuliah', 'label': 'Buku & Modul', 'icon': Icons.menu_book_outlined},
     {'name': 'Peralatan Masak & Makan', 'label': 'Alat Masak', 'icon': Icons.soup_kitchen_outlined},
-    {'name': 'Kendaraan & Aksesoris', 'label': 'Kendaraan & Helm', 'icon': Icons.two_wheeler_outlined},
-    {'name': 'Fashion & Seragam Kuliah', 'label': 'Fashion Kuliah', 'icon': Icons.checkroom_outlined},
+    {'name': 'Kendaraan & Aksesoris', 'label': 'Helm & Motor', 'icon': Icons.two_wheeler_outlined},
+    {'name': 'Fashion & Seragam Kuliah', 'label': 'Fashion', 'icon': Icons.checkroom_outlined},
     {'name': 'Kebutuhan Harian & Hobi', 'label': 'Harian & Hobi', 'icon': Icons.sports_tennis_outlined},
     {'name': 'Lain-lain', 'label': 'Lain-lain', 'icon': Icons.more_horiz},
-  ];
-
-  static const List<Map<String, String>> _promoBanners = [
-    {
-      'title': 'CampusTrade — Bursa Inventaris Kos Mahasiswa',
-      'subtitle': 'Platform perantara jual beli kasur, meja, dispenser & perlengkapan kos mahasiswa.',
-      'badge': 'VERIFIKASI MAHASISWA',
-      'accent': 'emerald',
-    },
-    {
-      'title': 'Bebas Biaya COD di Titik Temu Kampus Target',
-      'subtitle': 'Titik temu terpantau aman di Gerbang Utama Pos Satpam 24 Jam & Lobi Kampus UPI YPTK.',
-      'badge': 'GRATIS COD KAMPUS',
-      'accent': 'coral',
-    },
-    {
-      'title': 'Jaminan Rekber Tim CampusTrade',
-      'subtitle': 'Uang pembeli aman di rekening perantara tim hingga barang diperiksa fisik.',
-      'badge': 'ESCROW REKBER AMAN',
-      'accent': 'indigo',
-    },
   ];
 
   @override
   void initState() {
     super.initState();
     _searchController.text = widget.appState.searchKeyword;
+    _searchFocusNode.addListener(_onSearchFocusChanged);
+    _scrollController.addListener(_onScrollChanged);
     widget.appState.addListener(_onStateChanged);
+  }
+
+  void _onSearchFocusChanged() {
+    if (mounted) {
+      setState(() => _isSearchFocused = _searchFocusNode.hasFocus);
+    }
+  }
+
+  void _onScrollChanged() {
+    if (!_scrollController.hasClients) return;
+    final bool shouldShow = _scrollController.offset > 320;
+    if (shouldShow != _showScrollToTop && mounted) {
+      setState(() => _showScrollToTop = shouldShow);
+    }
   }
 
   void _onStateChanged() {
@@ -76,9 +77,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   void dispose() {
     widget.appState.removeListener(_onStateChanged);
+    _searchFocusNode.removeListener(_onSearchFocusChanged);
+    _scrollController.removeListener(_onScrollChanged);
+    _searchFocusNode.dispose();
     _searchController.dispose();
     _scrollController.dispose();
-    _bannerController.dispose();
     super.dispose();
   }
 
@@ -86,434 +89,660 @@ class _CatalogScreenState extends State<CatalogScreen> {
     final user = widget.appState.currentUser;
     if (user == null) {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => AuthScreen(appState: widget.appState)),
+        buildCampusRoute(AuthScreen(appState: widget.appState)),
       );
     } else if (user.statusVerifikasi == 'pending') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Akun Anda masih dalam antrean verifikasi KTM. Fitur jual aktif setelah disetujui.'),
+          content: Text(
+            'Akun kamu masih menunggu verifikasi KTM. Fitur pasang iklan aktif setelah disetujui.',
+          ),
         ),
       );
     } else if (user.statusVerifikasi == 'rejected') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Verifikasi KTM Anda ditolak. Silakan hubungi admin di tab Akun untuk validasi.'),
+          content: Text(
+            'Verifikasi KTM ditolak. Silakan hubungi admin di tab Akun untuk validasi ulang.',
+          ),
         ),
       );
     } else {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => SellProductScreen(appState: widget.appState)),
+        buildCampusRoute(SellProductScreen(appState: widget.appState)),
       );
     }
+  }
+
+  void _applyQuickSearch(String term) {
+    widget.appState.resetAllFilters();
+    _searchController.text = term;
+    widget.appState.setSearchKeyword(term);
+  }
+
+  void _scrollToTop() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 380),
+      curve: CampusMotion.easeOut,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isDesktop = screenWidth >= 960;
+    final int activeOrders = widget.appState.orders
+        .where((o) => o.status != 'selesai' && o.status != 'dibatalkan')
+        .length;
 
-    // Handle tab switching
-    if (_currentNavIndex == 1) {
-      return RadarMapScreen(
-        appState: widget.appState,
-        onBackToCatalog: () => setState(() => _currentNavIndex = 0),
-      );
-    } else if (_currentNavIndex == 3) {
-      return OrdersScreen(
-        appState: widget.appState,
-        onBackToCatalog: () => setState(() => _currentNavIndex = 0),
-      );
-    } else if (_currentNavIndex == 4) {
-      return ProfileScreen(
-        appState: widget.appState,
-        onBackToCatalog: () => setState(() => _currentNavIndex = 0),
-      );
-    }
-
-    // Default Tab 0: Main Marketplace Catalog
     return Scaffold(
-      backgroundColor: SwissColors.canvasWarm,
-      bottomNavigationBar: isDesktop ? null : _buildMobileBottomNav(),
-      body: SafeArea(
-        top: true,
-        bottom: !isDesktop,
-        child: Column(
-          children: [
-            // Sticky Top Marketplace Bar
-            _buildMarketplaceTopBar(screenWidth),
-
-            // Scrollable Content
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Pending KTM Notice Banner if any
-                    _buildPendingKtmNotice(),
-
-                    // Max Width Content Container
-                    Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1200),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Sliding Promo Banners
-                              _buildPromoCarousel(screenWidth),
-                              const SizedBox(height: 16),
-
-                              // Trust Guarantee Row
-                              _buildTrustHighlightRow(isDesktop),
-                              const SizedBox(height: 18),
-
-                              // Categories Horizontal Bar
-                              _buildCategorySelector(),
-                              const SizedBox(height: 18),
-
-                              // Filter and Sort Control Row
-                              _buildFilterAndSortRow(screenWidth),
-                              const SizedBox(height: 16),
-
-                              // Product Grid
-                              _buildProductGrid(screenWidth),
-                              const SizedBox(height: 32),
-
-                              // Safe COD spots preview & Campus Footer
-                              _buildCampusFooter(screenWidth),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      backgroundColor: CampusColors.canvasPaper,
+      extendBody: !isDesktop,
+      bottomNavigationBar: isDesktop
+          ? null
+          : CampusAnimatedBottomNav(
+              currentIndex: _currentNavIndex,
+              pendingOrdersCount: activeOrders,
+              onSelectTab: (idx) => setState(() => _currentNavIndex = idx),
+              onSellTap: _handleSellAction,
             ),
-          ],
-        ),
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        switchInCurve: CampusMotion.easeOut,
+        transitionBuilder: (child, animation) {
+          if (MediaQuery.disableAnimationsOf(context)) return child;
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: _buildCurrentTabBody(screenWidth, isDesktop),
       ),
     );
   }
 
-  Widget _buildMarketplaceTopBar(double screenWidth) {
-    final bool isDesktop = screenWidth >= 960;
+  Widget _buildCurrentTabBody(double screenWidth, bool isDesktop) {
+    if (_currentNavIndex == 1) {
+      return KeyedSubtree(
+        key: const ValueKey<int>(1),
+        child: RadarMapScreen(
+          appState: widget.appState,
+          onBackToCatalog: () => setState(() => _currentNavIndex = 0),
+        ),
+      );
+    } else if (_currentNavIndex == 3) {
+      return KeyedSubtree(
+        key: const ValueKey<int>(3),
+        child: OrdersScreen(
+          appState: widget.appState,
+          onBackToCatalog: () => setState(() => _currentNavIndex = 0),
+        ),
+      );
+    } else if (_currentNavIndex == 4) {
+      return KeyedSubtree(
+        key: const ValueKey<int>(4),
+        child: ProfileScreen(
+          appState: widget.appState,
+          onBackToCatalog: () => setState(() => _currentNavIndex = 0),
+        ),
+      );
+    }
+
+    return KeyedSubtree(
+      key: const ValueKey<int>(0),
+      child: Stack(
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              _buildSliverTopBar(screenWidth, isDesktop),
+              if (widget.appState.currentUser?.statusVerifikasi == 'pending')
+                SliverToBoxAdapter(child: _buildPendingKtmNotice()),
+              SliverToBoxAdapter(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1180),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        isDesktop ? 24 : 16,
+                        isDesktop ? 20 : 14,
+                        isDesktop ? 24 : 16,
+                        0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildCampusHeroCard(screenWidth),
+                          const SizedBox(height: 16),
+                          CampusTrustStrip(isDesktop: isDesktop),
+                          const SizedBox(height: 22),
+                          _buildSectionHeader(
+                            title: 'Kategori Kebutuhan Kos',
+                            trailingText:
+                                widget.appState.selectedCategory == 'Semua'
+                                    ? null
+                                    : 'Reset',
+                            onTrailingTap: () {
+                              _searchController.clear();
+                              widget.appState.resetAllFilters();
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          _buildCategorySelector(),
+                          const SizedBox(height: 16),
+                          _buildFilterAndSortRow(screenWidth),
+                          const SizedBox(height: 16),
+                          _buildProductGrid(screenWidth),
+                          const SizedBox(height: 28),
+                          _buildCampusFooter(),
+                          // Reserve clear scroll room above floating bottom nav
+                          SizedBox(height: isDesktop ? 32 : 104),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Floating Scroll-to-Top Pill
+          Positioned(
+            right: 16,
+            bottom: isDesktop ? 24 : 92,
+            child: IgnorePointer(
+              ignoring: !_showScrollToTop,
+              child: AnimatedOpacity(
+                opacity: _showScrollToTop ? 1.0 : 0.0,
+                duration: CampusMotion.standard,
+                child: AnimatedScale(
+                  scale: _showScrollToTop ? 1.0 : 0.85,
+                  duration: CampusMotion.standard,
+                  curve: CampusMotion.easeOut,
+                  child: TactilePress(
+                    onTap: _scrollToTop,
+                    borderRadius: BorderRadius.circular(24),
+                    child: Container(
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: CampusColors.inkPrimary,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x280F172A),
+                            blurRadius: 14,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.arrow_upward_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Ke atas',
+                            style: SwissTheme.sans(
+                              size: 11.5,
+                              weight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Smooth collapsible SliverAppBar: top brand/location bar glides away on scroll
+  /// while the search bar remains pinned cleanly for effortless browsing.
+  SliverAppBar _buildSliverTopBar(double screenWidth, bool isDesktop) {
     final UserModel? user = widget.appState.currentUser;
     final int favCount = widget.appState.favoriteProductIds.length;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
-        color: SwissColors.canvasPure,
-        border: Border(bottom: BorderSide(color: SwissColors.borderHairline)),
-      ),
-      child: Center(
+    return SliverAppBar(
+      pinned: true,
+      floating: true,
+      snap: true,
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      shadowColor: const Color(0x140F172A),
+      backgroundColor: CampusColors.surfacePure,
+      surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 58,
+      titleSpacing: 0,
+      title: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Top Location Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, size: 14, color: SwissColors.rauschCoral),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Target Kampus: UPI YPTK Padang • Lubuk Begalung',
-                        style: SwissTheme.mono(size: 11, weight: FontWeight.w700, color: SwissColors.inkPrimary),
-                      ),
-                    ],
-                  ),
-                  if (user != null && user.role == 'admin') ...[
-                    InkWell(
-                      onTap: () => widget.appState.navigateTo('admin'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: SwissColors.escrowIndigo,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'PORTAL ADMIN CMS',
-                          style: SwissTheme.mono(size: 9, weight: FontWeight.w700, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Search Row + Desktop Nav Links
-              Row(
-                children: [
-                  // Brand Logo
-                  InkWell(
-                    onTap: () {
-                      widget.appState.resetAllFilters();
-                      setState(() => _currentNavIndex = 0);
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: SwissColors.rauschCoral,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.swap_horiz, color: Colors.white, size: 22),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'CampusTrade',
-                              style: SwissTheme.display(size: 15, weight: FontWeight.w800),
-                            ),
-                            Text(
-                              'BURSA MAHASISWA',
-                              style: SwissTheme.mono(size: 8, weight: FontWeight.w700, color: SwissColors.inkMuted),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-
-                  // Search Bar Input (Symmetric 42px Centered Target)
-                  Expanded(
-                    child: Container(
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: SwissColors.borderHairline),
-                      ),
-                      alignment: Alignment.center,
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (val) => widget.appState.setSearchKeyword(val),
-                        textAlignVertical: TextAlignVertical.center,
-                        style: SwissTheme.sans(size: 12.5, color: SwissColors.inkPrimary),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                          hintText: 'Cari kasur, dispenser, meja kos, modul...',
-                          hintStyle: SwissTheme.sans(size: 12, color: SwissColors.inkMuted),
-                          prefixIcon: const Icon(Icons.search, size: 18, color: SwissColors.inkSecondary),
-                          prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 42),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? SizedBox(
-                                  width: 36,
-                                  height: 42,
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(Icons.clear, size: 16, color: SwissColors.inkSecondary),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      widget.appState.setSearchKeyword('');
-                                    },
-                                  ),
-                                )
-                              : null,
-                          suffixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 42),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-
-                  // Wishlist Icon with badge
-                  IconButton(
-                    icon: Badge(
-                      isLabelVisible: favCount > 0,
-                      label: Text('$favCount', style: const TextStyle(fontSize: 10)),
-                      child: const Icon(Icons.favorite_border, color: SwissColors.inkPrimary, size: 22),
-                    ),
-                    tooltip: 'Wishlist Saya',
-                    onPressed: () {
-                      setState(() => _currentNavIndex = 4);
-                    },
-                  ),
-
-                  // Desktop sell CTA & User profile
-                  if (isDesktop) ...[
-                    const SizedBox(width: 6),
-                    ElevatedButton.icon(
-                      onPressed: _handleSellAction,
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Pasang Iklan'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: SwissColors.rauschCoral,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    OutlinedButton(
-                      onPressed: () {
-                        if (user == null) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => AuthScreen(appState: widget.appState)),
-                          );
-                        } else {
-                          setState(() => _currentNavIndex = 4);
-                        }
+          constraints: const BoxConstraints(maxWidth: 1180),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TactilePress(
+                      onTap: () {
+                        _searchController.clear();
+                        widget.appState.resetAllFilters();
+                        _scrollToTop();
                       },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: SwissColors.inkPrimary,
-                        side: const BorderSide(color: SwissColors.borderHairline),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  CampusColors.campusCobaltDeep,
+                                  CampusColors.campusCobalt,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.swap_horiz_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 9),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'CampusTrade',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: SwissTheme.display(
+                                    size: 16,
+                                    weight: FontWeight.w800,
+                                    letterSpacing: -0.4,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.place_rounded,
+                                      size: 11,
+                                      color: CampusColors.campusCobalt,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Flexible(
+                                      child: Text(
+                                        'UPI YPTK • Lubeg',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: SwissTheme.sans(
+                                          size: 10.5,
+                                          weight: FontWeight.w600,
+                                          color: CampusColors.inkMuted,
+                                          height: 1.1,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                if (user != null && user.role == 'admin') ...[
+                  TactilePress(
+                    onTap: () => widget.appState.navigateTo('admin'),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: CampusColors.inkPrimary,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        user != null ? '@${user.username}' : 'Masuk / Daftar',
-                        style: SwissTheme.display(size: 12, weight: FontWeight.w700),
+                        'Admin CMS',
+                        style: SwissTheme.sans(
+                          size: 11,
+                          weight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1.1,
+                        ),
                       ),
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 6),
                 ],
+
+                // Wishlist shortcut
+                SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: IconButton(
+                    icon: Badge(
+                      isLabelVisible: favCount > 0,
+                      backgroundColor: CampusColors.sunburstCoral,
+                      label: Text(
+                        '$favCount',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.favorite_border_rounded,
+                        color: CampusColors.inkPrimary,
+                        size: 22,
+                      ),
+                    ),
+                    tooltip: 'Wishlist Saya',
+                    onPressed: () => setState(() => _currentNavIndex = 4),
+                  ),
+                ),
+
+                if (isDesktop) ...[
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: _handleSellAction,
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('Pasang Iklan'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CampusColors.sunburstCoral,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 11,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: () {
+                      if (user == null) {
+                        Navigator.of(context).push(
+                          buildCampusRoute(AuthScreen(appState: widget.appState)),
+                        );
+                      } else {
+                        setState(() => _currentNavIndex = 4);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: CampusColors.inkPrimary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 11,
+                      ),
+                    ),
+                    child: Text(
+                      user != null ? '@${user.username}' : 'Masuk / Daftar',
+                      style: SwissTheme.display(size: 12.5, weight: FontWeight.w700),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(62),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(
+            isDesktop ? 24 : 16,
+            4,
+            isDesktop ? 24 : 16,
+            12,
+          ),
+          decoration: const BoxDecoration(
+            color: CampusColors.surfacePure,
+            border: Border(
+              bottom: BorderSide(color: CampusColors.borderHairline),
+            ),
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1180),
+              child: AnimatedContainer(
+                duration: CampusMotion.fast,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: _isSearchFocused
+                      ? CampusColors.surfacePure
+                      : CampusColors.surfaceSubtle,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _isSearchFocused
+                        ? CampusColors.campusCobalt
+                        : CampusColors.borderHairline,
+                    width: _isSearchFocused ? 1.5 : 1.0,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  onChanged: (val) => widget.appState.setSearchKeyword(val),
+                  textAlignVertical: TextAlignVertical.center,
+                  style: SwissTheme.sans(
+                    size: 13,
+                    color: CampusColors.inkPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 0,
+                    ),
+                    hintText: 'Cari kasur, meja lipat, dispenser, buku...',
+                    hintStyle: SwissTheme.sans(
+                      size: 12.5,
+                      color: CampusColors.inkMuted,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      size: 19,
+                      color: _isSearchFocused
+                          ? CampusColors.campusCobalt
+                          : CampusColors.inkSecondary,
+                    ),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 42,
+                      minHeight: 44,
+                    ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? SizedBox(
+                            width: 40,
+                            height: 44,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              tooltip: 'Hapus pencarian',
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                size: 17,
+                                color: CampusColors.inkSecondary,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                widget.appState.setSearchKeyword('');
+                              },
+                            ),
+                          )
+                        : null,
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 44,
+                    ),
+                  ),
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPromoCarousel(double screenWidth) {
-    final bool isMobile = screenWidth < 768;
+  /// Vibrant Coastal Cobalt Hero Card with subtle architectural rings & Sunburst Coral CTA.
+  Widget _buildCampusHeroCard(double screenWidth) {
+    final bool isCompact = screenWidth < 680;
+    final int approvedCount = widget.appState.products
+        .where((p) => p.statusVerifikasi == 'approved')
+        .length;
+    final int activeCodCount = widget.appState.activeCodSpots.length;
 
     return Container(
-      height: isMobile ? 130 : 150,
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [
+            CampusColors.inkPrimary,
+            CampusColors.oceanTealDark,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Color(0x1E0F172A),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          PageView.builder(
-            controller: _bannerController,
-            itemCount: _promoBanners.length,
-            onPageChanged: (idx) => setState(() => _activeBannerIndex = idx),
-            itemBuilder: (context, idx) {
-              final b = _promoBanners[idx];
-              Color startColor;
-              Color endColor;
-              if (b['accent'] == 'coral') {
-                startColor = const Color(0xFFE11D48);
-                endColor = const Color(0xFFFF5A5F);
-              } else if (b['accent'] == 'indigo') {
-                startColor = const Color(0xFF4F46E5);
-                endColor = const Color(0xFF6366F1);
-              } else {
-                startColor = const Color(0xFF0F766E);
-                endColor = const Color(0xFF059669);
-              }
-
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [startColor, endColor],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              b['badge']!,
-                              style: SwissTheme.mono(size: 9, weight: FontWeight.w800, color: Colors.white),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            b['title']!,
-                            style: SwissTheme.display(
-                              size: isMobile ? 15 : 18,
-                              weight: FontWeight.w800,
-                              color: Colors.white,
-                              height: 1.2,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            b['subtitle']!,
-                            style: SwissTheme.sans(
-                              size: isMobile ? 11 : 12,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      idx == 0
-                          ? Icons.inventory_2_outlined
-                          : (idx == 1 ? Icons.handshake_outlined : Icons.shield_outlined),
-                      size: isMobile ? 48 : 64,
-                      color: Colors.white.withValues(alpha: 0.25),
-                    ),
-                  ],
-                ),
-              );
-            },
+          Positioned.fill(
+            child: CustomPaint(painter: _HeroRingsPainter()),
           ),
-
-          // Dots Indicator
-          Positioned(
-            bottom: 8,
-            right: 16,
-            child: Row(
-              children: List.generate(
-                _promoBanners.length,
-                (i) => Container(
-                  width: _activeBannerIndex == i ? 16 : 6,
-                  height: 6,
-                  margin: const EdgeInsets.only(left: 4),
-                  decoration: BoxDecoration(
-                    color: _activeBannerIndex == i ? Colors.white : Colors.white54,
-                    borderRadius: BorderRadius.circular(3),
+          Padding(
+            padding: EdgeInsets.all(isCompact ? 20 : 26),
+            child: isCompact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeroCopy(approvedCount, activeCodCount, isCompact),
+                      const SizedBox(height: 18),
+                      _buildHeroActions(),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: _buildHeroCopy(
+                          approvedCount,
+                          activeCodCount,
+                          isCompact,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      _buildHeroActions(),
+                    ],
                   ),
-                ),
-              ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroCopy(int approvedCount, int activeCodCount, bool isCompact) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Bursa Barang Kos Khusus Mahasiswa',
+          style: SwissTheme.display(
+            size: isCompact ? 20 : 25,
+            weight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: -0.5,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 7),
+        Text(
+          'Oper kasur, meja belajar, dispenser, hingga buku kuliah langsung dari sesama mahasiswa terverifikasi KTM di sekitar Lubuk Begalung.',
+          style: SwissTheme.sans(
+            size: isCompact ? 12.5 : 13.5,
+            color: Colors.white.withValues(alpha: 0.9),
+            height: 1.45,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
+          children: [
+            _buildHeroFact(
+              Icons.inventory_2_outlined,
+              '$approvedCount barang siap angkut',
+            ),
+            _buildHeroFact(
+              Icons.place_outlined,
+              '$activeCodCount titik COD kampus',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroFact(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13.5, color: const Color(0xFFBAE6FD)),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: SwissTheme.sans(
+              size: 11.5,
+              weight: FontWeight.w700,
+              color: Colors.white,
+              height: 1.1,
             ),
           ),
         ],
@@ -521,52 +750,97 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  Widget _buildTrustHighlightRow(bool isDesktop) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: SwissColors.canvasPure,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: SwissColors.borderHairline),
-      ),
-      child: isDesktop
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildTrustItem(Icons.verified, 'Verifikasi KTM Mahasiswa'),
-                _buildTrustItem(Icons.security, 'Rekber Anti-Penipuan'),
-                _buildTrustItem(Icons.place, 'Gratis COD Kampus UPI YPTK'),
-                _buildTrustItem(Icons.delivery_dining, 'Layanan Kurir Antar Kos'),
+  Widget _buildHeroActions() {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        TactilePress(
+          onTap: _handleSellAction,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: CampusColors.oceanTeal,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x330D9488),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
               ],
-            )
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildTrustItem(Icons.verified, 'Verifikasi KTM'),
-                  const SizedBox(width: 16),
-                  _buildTrustItem(Icons.security, 'Rekber Admin'),
-                  const SizedBox(width: 16),
-                  _buildTrustItem(Icons.place, 'Bebas COD Kampus'),
-                  const SizedBox(width: 16),
-                  _buildTrustItem(Icons.delivery_dining, 'Kurir Kos Lubeg'),
-                ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.add_rounded, size: 18, color: Colors.white),
+                const SizedBox(width: 6),
+                Text(
+                  'Jual Barang Kos',
+                  style: SwissTheme.display(
+                    size: 13,
+                    weight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        TactilePress(
+          onTap: () => showEscrowExplainerSheet(context),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+            ),
+            child: Text(
+              'Alur Rekber',
+              style: SwissTheme.display(
+                size: 13,
+                weight: FontWeight.w700,
+                color: Colors.white,
               ),
             ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildTrustItem(IconData icon, String text) {
+  Widget _buildSectionHeader({
+    required String title,
+    String? trailingText,
+    VoidCallback? onTrailingTap,
+  }) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(icon, size: 16, color: SwissColors.verifiedEmerald),
-        const SizedBox(width: 6),
         Text(
-          text,
-          style: SwissTheme.sans(size: 11, weight: FontWeight.w600, color: SwissColors.inkPrimary),
+          title,
+          style: SwissTheme.display(size: 16, weight: FontWeight.w800),
         ),
+        if (trailingText != null && onTrailingTap != null)
+          TextButton(
+            onPressed: onTrailingTap,
+            style: TextButton.styleFrom(
+              foregroundColor: CampusColors.sunburstCoral,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: const Size(44, 36),
+            ),
+            child: Text(
+              trailingText,
+              style: SwissTheme.sans(
+                size: 12,
+                weight: FontWeight.w700,
+                color: CampusColors.sunburstCoral,
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -582,33 +856,45 @@ class _CatalogScreenState extends State<CatalogScreen> {
           final bool isSelected = currentCategory == c['name'];
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: InkWell(
-              onTap: () => widget.appState.setCategory(c['name']!),
+            child: TactilePress(
+              onTap: () => widget.appState.setCategory(c['name'] as String),
               borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                duration: const Duration(milliseconds: 200),
+                curve: CampusMotion.easeOut,
+                constraints: const BoxConstraints(minHeight: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
                 decoration: BoxDecoration(
-                  color: isSelected ? SwissColors.inkPrimary : SwissColors.canvasPure,
+                  color: isSelected
+                      ? CampusColors.campusCobalt
+                      : CampusColors.surfacePure,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? SwissColors.inkPrimary : SwissColors.borderHairline,
+                    color: isSelected
+                        ? CampusColors.campusCobalt
+                        : CampusColors.borderHairline,
                   ),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       c['icon'] as IconData,
                       size: 16,
-                      color: isSelected ? Colors.white : SwissColors.inkSecondary,
+                      color: isSelected
+                          ? Colors.white
+                          : CampusColors.campusCobalt,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      c['label']!,
+                      c['label'] as String,
                       style: SwissTheme.sans(
-                        size: 11,
-                        weight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? Colors.white : SwissColors.inkPrimary,
+                        size: 12,
+                        weight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color: isSelected
+                            ? Colors.white
+                            : CampusColors.inkPrimary,
+                        height: 1.1,
                       ),
                     ),
                   ],
@@ -631,40 +917,49 @@ class _CatalogScreenState extends State<CatalogScreen> {
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
                 _buildRadiusChip('Semua ($productCount)', 'all', currentRadius),
                 _buildRadiusChip('< 500m', '0.5', currentRadius),
-                _buildRadiusChip('< 1 KM', '1', currentRadius),
-                _buildRadiusChip('< 2 KM', '2', currentRadius),
+                _buildRadiusChip('< 1 km', '1', currentRadius),
+                _buildRadiusChip('< 2 km', '2', currentRadius),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 8),
-
-        // Sort Dropdown
+        const SizedBox(width: 10),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            color: SwissColors.canvasPure,
+            color: CampusColors.surfacePure,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: SwissColors.borderHairline),
+            border: Border.all(color: CampusColors.borderHairline),
           ),
-          child: DropdownButton<String>(
-            value: currentSort,
-            underline: const SizedBox.shrink(),
-            icon: const Icon(Icons.sort, size: 16, color: SwissColors.inkSecondary),
-            style: SwissTheme.sans(size: 11, weight: FontWeight.w600, color: SwissColors.inkPrimary),
-            items: const [
-              DropdownMenuItem(value: 'terbaru', child: Text('Terbaru')),
-              DropdownMenuItem(value: 'termurah', child: Text('Termurah')),
-              DropdownMenuItem(value: 'termahal', child: Text('Termahal')),
-              DropdownMenuItem(value: 'terdekat', child: Text('Terdekat')),
-            ],
-            onChanged: (val) {
-              if (val != null) widget.appState.setSortOption(val);
-            },
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: currentSort,
+              icon: const Icon(
+                Icons.swap_vert_rounded,
+                size: 16,
+                color: CampusColors.campusCobalt,
+              ),
+              style: SwissTheme.sans(
+                size: 12,
+                weight: FontWeight.w600,
+                color: CampusColors.inkPrimary,
+              ),
+              items: const [
+                DropdownMenuItem(value: 'terbaru', child: Text('Terbaru')),
+                DropdownMenuItem(value: 'termurah', child: Text('Termurah')),
+                DropdownMenuItem(value: 'termahal', child: Text('Termahal')),
+                DropdownMenuItem(value: 'terdekat', child: Text('Terdekat')),
+              ],
+              onChanged: (val) {
+                if (val != null) widget.appState.setSortOption(val);
+              },
+            ),
           ),
         ),
       ],
@@ -674,20 +969,39 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget _buildRadiusChip(String label, String value, String current) {
     final bool active = current == value;
     return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: ChoiceChip(
-        selected: active,
-        label: Text(label),
-        labelStyle: SwissTheme.sans(
-          size: 10,
-          weight: active ? FontWeight.w700 : FontWeight.w500,
-          color: active ? Colors.white : SwissColors.inkPrimary,
+      padding: const EdgeInsets.only(right: 8),
+      child: TactilePress(
+        onTap: () => widget.appState.setRadiusFilter(value),
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: CampusMotion.fast,
+          constraints: const BoxConstraints(minHeight: 38),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: active
+                ? CampusColors.sunburstCoralSoft
+                : CampusColors.surfacePure,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: active
+                  ? CampusColors.sunburstCoral
+                  : CampusColors.borderHairline,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: SwissTheme.sans(
+                size: 11.5,
+                weight: active ? FontWeight.w700 : FontWeight.w500,
+                color: active
+                    ? CampusColors.sunburstCoral
+                    : CampusColors.inkPrimary,
+                height: 1.1,
+              ),
+            ),
+          ),
         ),
-        backgroundColor: SwissColors.canvasPure,
-        selectedColor: SwissColors.rauschCoral,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        side: BorderSide(color: active ? SwissColors.rauschCoral : SwissColors.borderHairline),
-        onSelected: (_) => widget.appState.setRadiusFilter(value),
       ),
     );
   }
@@ -696,160 +1010,112 @@ class _CatalogScreenState extends State<CatalogScreen> {
     final List<ProductModel> products = widget.appState.filteredCatalogProducts;
 
     if (products.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: SwissColors.canvasPure,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: SwissColors.borderHairline),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.search_off, size: 32, color: SwissColors.inkMuted),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Tidak Ditemukan Barang yang Sesuai',
-              style: SwissTheme.display(size: 15, weight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Coba gunakan kata kunci lain atau ubah filter kategori dan radius jarak kos Anda.',
-              textAlign: TextAlign.center,
-              style: SwissTheme.sans(size: 12, color: SwissColors.inkSecondary),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => widget.appState.resetAllFilters(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: SwissColors.inkPrimary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('Reset Semua Filter'),
-            ),
-          ],
-        ),
+      final bool hasKeyword = widget.appState.searchKeyword.trim().isNotEmpty;
+      return CampusEmptyState(
+        kind: CampusEmptyKind.searchEmpty,
+        title: hasKeyword
+            ? 'Barang "${widget.appState.searchKeyword.trim()}" belum ada di kos sekitar'
+            : 'Belum ada barang kos di filter ini',
+        subtitle:
+            'Coba perluas radius jarak kos, ganti kategori, atau cek kata kunci populer yang sering dioper mahasiswa.',
+        suggestionChips: const ['Kasur', 'Meja', 'Dispenser', 'Buku', 'Kipas'],
+        onSuggestionTap: _applyQuickSearch,
+        primaryActionLabel: 'Reset Semua Filter',
+        onPrimaryAction: () {
+          _searchController.clear();
+          widget.appState.resetAllFilters();
+        },
       );
     }
 
-    // Responsive Column Count
     int crossAxisCount = 2;
-    if (screenWidth >= 1200) {
+    if (screenWidth >= 1120) {
       crossAxisCount = 4;
-    } else if (screenWidth >= 768) {
+    } else if (screenWidth >= 740) {
       crossAxisCount = 3;
+    } else if (screenWidth < 340) {
+      crossAxisCount = 1;
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: products.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: crossAxisCount == 2 ? 0.65 : 0.72,
-      ),
-      itemBuilder: (context, index) {
-        return _buildProductCard(products[index]);
-      },
+    return SwissResponsiveGrid(
+      crossAxisCount: crossAxisCount,
+      spacing: 12,
+      runSpacing: 14,
+      children: List.generate(products.length, (index) {
+        return StaggeredEntrance(
+          key: ValueKey<int>(products[index].id),
+          index: index,
+          child: _buildProductCard(products[index]),
+        );
+      }),
     );
   }
 
   Widget _buildProductCard(ProductModel p) {
     final bool isFav = widget.appState.isFavorite(p.id);
+    final String sellerInitials = p.namaPenjual.trim().length >= 2
+        ? p.namaPenjual.trim().substring(0, 2).toUpperCase()
+        : 'MH';
 
-    return InkWell(
+    return TactilePress(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(appState: widget.appState, product: p),
+          buildCampusRoute(
+            ProductDetailScreen(appState: widget.appState, product: p),
           ),
         );
       },
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: SwissColors.canvasPure,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: SwissColors.borderHairline),
+          color: CampusColors.surfacePure,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CampusColors.borderHairline),
           boxShadow: const [
-            BoxShadow(color: Color(0x06000000), blurRadius: 6, offset: Offset(0, 2)),
+            BoxShadow(
+              color: Color(0x0A0F172A),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
           ],
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Image Container with category & favorite heart
             AspectRatio(
-              aspectRatio: 1.15,
-              child: Container(
-                color: const Color(0xFFF1F5F9),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Center(
-                      child: Icon(
-                        _getCategoryIcon(p.kategori),
-                        size: 40,
-                        color: SwissColors.rauschCoral.withValues(alpha: 0.8),
-                      ),
+              aspectRatio: 1.18,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Hero(
+                    tag: 'product-image-${p.id}',
+                    child: CampusProductImage(
+                      imageUrl: p.foto,
+                      category: p.kategori,
+                      fallbackIcon: _getCategoryIcon(p.kategori),
                     ),
-                    // KTM badge
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: SwissColors.inkPrimary.withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.verified, size: 10, color: SwissColors.verifiedEmerald),
-                            const SizedBox(width: 3),
-                            Text(
-                              'KTM VERIF',
-                              style: SwissTheme.mono(size: 8, weight: FontWeight.w700, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: ConditionBadge(rawCondition: p.kondisi),
+                  ),
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: BouncyHeartButton(
+                      isFavorite: isFav,
+                      onToggle: () => widget.appState.toggleFavorite(p.id),
                     ),
-                    // Favorite button
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: IconButton(
-                        icon: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          size: 18,
-                          color: isFav ? SwissColors.rauschCoral : SwissColors.inkMuted,
-                        ),
-                        onPressed: () => widget.appState.toggleFavorite(p.id),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
-            // Product Details
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -857,68 +1123,140 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title
                         Text(
                           p.namaBarang,
-                          style: SwissTheme.display(size: 12, weight: FontWeight.w700, height: 1.25),
+                          style: SwissTheme.display(
+                            size: 13.5,
+                            weight: FontWeight.w700,
+                            height: 1.28,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
-
-                        // Location
-                        Row(
-                          children: [
-                            const Icon(Icons.place_outlined, size: 11, color: SwissColors.inkMuted),
-                            const SizedBox(width: 2),
-                            Expanded(
-                              child: Text(
-                                '${p.lokasiKos} • ${p.distanceToCampusKm}km',
-                                style: SwissTheme.sans(size: 10, color: SwissColors.inkMuted),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    // Price & Savings
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              SwissTheme.formatRupiah(p.harga),
-                              style: SwissTheme.display(
-                                size: 14,
-                                weight: FontWeight.w900,
-                                color: SwissColors.rauschCoral,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 6),
+                        Text(
+                          SwissTheme.formatRupiah(p.harga),
+                          style: SwissTheme.display(
+                            size: 15.5,
+                            weight: FontWeight.w800,
+                            color: CampusColors.sunburstCoral,
+                          ),
                         ),
                         if (p.effectiveOriginalPrice > p.harga) ...[
+                          const SizedBox(height: 2),
                           Row(
                             children: [
-                              Text(
-                                SwissTheme.formatRupiah(p.effectiveOriginalPrice),
-                                style: SwissTheme.sans(
-                                  size: 10,
-                                  color: SwissColors.inkMuted,
-                                  decoration: TextDecoration.lineThrough,
+                              Flexible(
+                                child: Text(
+                                  SwissTheme.formatRupiah(
+                                    p.effectiveOriginalPrice,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: SwissTheme.sans(
+                                    size: 11,
+                                    color: CampusColors.inkMuted,
+                                    decoration: TextDecoration.lineThrough,
+                                    height: 1.2,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '-${p.savingsPercent}%',
-                                style: SwissTheme.mono(size: 9, weight: FontWeight.w700, color: SwissColors.dangerRose),
+                              const SizedBox(width: 5),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: CampusColors.sunburstCoralSoft,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(
+                                  '-${p.savingsPercent}%',
+                                  style: SwissTheme.mono(
+                                    size: 10,
+                                    weight: FontWeight.w700,
+                                    color: CampusColors.sunburstCoral,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ],
+                      ],
+                    ),
+
+                    Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        const Divider(
+                          height: 1,
+                          color: CampusColors.borderHairline,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: const BoxDecoration(
+                                color: CampusColors.campusCobaltSoft,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  sellerInitials,
+                                  style: SwissTheme.mono(
+                                    size: 9.5,
+                                    weight: FontWeight.w800,
+                                    color: CampusColors.campusCobalt,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          p.namaPenjual.split(' ').first,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: SwissTheme.sans(
+                                            size: 11,
+                                            weight: FontWeight.w700,
+                                            color: CampusColors.inkPrimary,
+                                            height: 1.15,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 3),
+                                      const Icon(
+                                        Icons.verified_rounded,
+                                        size: 12.5,
+                                        color: CampusColors.verifiedJade,
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${p.distanceToCampusKm} km • ${p.lokasiKos}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: SwissTheme.sans(
+                                      size: 10.5,
+                                      color: CampusColors.inkMuted,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -933,23 +1271,33 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   Widget _buildPendingKtmNotice() {
     final user = widget.appState.currentUser;
-    if (user == null || user.statusVerifikasi != 'pending') return const SizedBox.shrink();
+    if (user == null || user.statusVerifikasi != 'pending') {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFFFEF3C7),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: CampusColors.cautionAmberSoft,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
+          constraints: const BoxConstraints(maxWidth: 1180),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, size: 16, color: SwissColors.cautionAmber),
+              const Icon(
+                Icons.hourglass_top_outlined,
+                size: 16,
+                color: CampusColors.cautionAmber,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Akun (@${user.username}) sedang menunggu verifikasi berkas KTM oleh Tim Verifikator CampusTrade (Target: UPI YPTK).',
-                  style: SwissTheme.sans(size: 11, color: const Color(0xFF78350F), weight: FontWeight.w600),
+                  'Akun (@${user.username}) sedang menunggu verifikasi KTM oleh tim CampusTrade (Target: UPI YPTK).',
+                  style: SwissTheme.sans(
+                    size: 12,
+                    color: const Color(0xFF78350F),
+                    weight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -959,121 +1307,53 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  Widget _buildCampusFooter(double screenWidth) {
+  Widget _buildCampusFooter() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: SwissColors.canvasPure,
+        color: CampusColors.surfacePure,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: SwissColors.borderHairline),
+        border: Border.all(color: CampusColors.borderHairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.school_outlined, size: 20, color: SwissColors.rauschCoral),
+              const Icon(
+                Icons.school_outlined,
+                size: 18,
+                color: CampusColors.campusCobalt,
+              ),
               const SizedBox(width: 8),
-              Text(
-                'CampusTrade — Platform Bursa Mahasiswa',
-                style: SwissTheme.display(size: 14, weight: FontWeight.w800),
+              Expanded(
+                child: Text(
+                  'CampusTrade: Bursa Inventaris Mahasiswa',
+                  style: SwissTheme.display(size: 14, weight: FontWeight.w800),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            'Platform independen penghubung bursa inventaris & perabotan kos mahasiswa (Zona Target Operasional: UPI YPTK Padang & Lubuk Begalung). Tim CampusTrade memfasilitasi verifikasi fisik, serah terima COD aman, dan sistem rekber antar mahasiswa.',
-            style: SwissTheme.sans(size: 11, height: 1.4, color: SwissColors.inkSecondary),
+            'Platform independen untuk jual beli perabotan dan perlengkapan kos antar mahasiswa di sekitar UPI YPTK Padang dan Lubuk Begalung. Dilengkapi verifikasi KTM, kurasi fisik, dan titik temu COD aman.',
+            style: SwissTheme.sans(
+              size: 12,
+              height: 1.5,
+              color: CampusColors.inkSecondary,
+            ),
           ),
           const SizedBox(height: 12),
-          const Divider(color: SwissColors.borderHairline),
+          const Divider(color: CampusColors.borderHairline),
           const SizedBox(height: 8),
           Text(
-            '© 2026 CampusTrade • Rekber Tim Verifikator Mahasiswa (Target: UPI YPTK)',
-            style: SwissTheme.mono(size: 10, color: SwissColors.inkMuted),
+            '© 2026 CampusTrade • Rekber Tim Verifikator Mahasiswa (UPI YPTK Padang)',
+            style: SwissTheme.sans(
+              size: 11,
+              color: CampusColors.inkMuted,
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMobileBottomNav() {
-    return Container(
-      height: 64,
-      decoration: const BoxDecoration(
-        color: SwissColors.canvasPure,
-        border: Border(top: BorderSide(color: SwissColors.borderHairline)),
-        boxShadow: [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, -2)),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildBottomNavItem(0, Icons.storefront_outlined, Icons.storefront, 'Katalog'),
-          _buildBottomNavItem(1, Icons.radar_outlined, Icons.radar, 'Radar Kos'),
-          _buildBottomSellButton(),
-          _buildBottomNavItem(3, Icons.receipt_long_outlined, Icons.receipt_long, 'Pesanan'),
-          _buildBottomNavItem(4, Icons.person_outline, Icons.person, 'Akun'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavItem(int index, IconData unselectedIcon, IconData selectedIcon, String label) {
-    final bool active = _currentNavIndex == index;
-    return InkWell(
-      onTap: () => setState(() => _currentNavIndex = index),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              active ? selectedIcon : unselectedIcon,
-              color: active ? SwissColors.rauschCoral : SwissColors.inkSecondary,
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: SwissTheme.sans(
-                size: 10,
-                weight: active ? FontWeight.w700 : FontWeight.w500,
-                color: active ? SwissColors.rauschCoral : SwissColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSellButton() {
-    return InkWell(
-      onTap: _handleSellAction,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: SwissColors.rauschCoral,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(color: Color(0x33FF385C), blurRadius: 8, offset: Offset(0, 2)),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add, color: Colors.white, size: 18),
-            const SizedBox(width: 4),
-            Text(
-              'Jual',
-              style: SwissTheme.display(size: 12, weight: FontWeight.w700, color: Colors.white),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -1100,4 +1380,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
         return Icons.inventory_2_outlined;
     }
   }
+}
+
+/// Subtle architectural concentric corner rings for the Cobalt Hero Card.
+class _HeroRingsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint ringPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final Offset anchor = Offset(size.width - 28, 22);
+    canvas.drawCircle(anchor, 56, ringPaint);
+    canvas.drawCircle(anchor, 98, ringPaint);
+    canvas.drawCircle(anchor, 142, ringPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

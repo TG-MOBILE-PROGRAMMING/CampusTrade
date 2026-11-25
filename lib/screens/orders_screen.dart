@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
 import '../theme/swiss_theme.dart';
+import '../widgets/campus_empty_state.dart';
 
 /// ============================================================================
 /// ORDERS SCREEN (DEDICATED FULL-PAGE TRANSACTION & ESCROW TRACKER)
@@ -124,46 +125,23 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _buildEmptyState() {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.receipt_long_outlined, size: 36, color: SwissColors.inkMuted),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Belum Ada Transaksi Aktif',
-              style: SwissTheme.display(size: 16, weight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Pesanan barang kos yang Anda beli atau ajukan rekber admin akan muncul di sini secara real-time.',
-              textAlign: TextAlign.center,
-              style: SwissTheme.sans(size: 12, color: SwissColors.inkSecondary),
-            ),
-            const SizedBox(height: 20),
-            if (widget.onBackToCatalog != null)
-              ElevatedButton.icon(
-                onPressed: widget.onBackToCatalog,
-                icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-                label: const Text('Mulai Belanja di Katalog'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SwissColors.rauschCoral,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-              ),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: CampusEmptyState(
+            kind: CampusEmptyKind.ordersEmpty,
+            title: _selectedStatusFilter == 'all'
+                ? 'Belum ada transaksi kos nih'
+                : 'Belum ada pesanan di status ini',
+            subtitle:
+                'Pesanan barang kos yang kamu ajukan lewat COD kampus atau kurir rekber akan muncul rapi di sini.',
+            primaryActionLabel: widget.onBackToCatalog != null
+                ? 'Jelajahi Katalog Kos'
+                : 'Tampilkan Semua Status',
+            onPrimaryAction: widget.onBackToCatalog ??
+                () => setState(() => _selectedStatusFilter = 'all'),
+          ),
         ),
       ),
     );
@@ -259,11 +237,31 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      order.metodePenyerahan == 'antar_admin'
-                          ? '🛵 Diantar Kurir Admin ke Kos Mahasiswa'
-                          : '📍 COD di Kampus (${order.titikCod})',
-                      style: SwissTheme.sans(size: 11, weight: FontWeight.w600, color: SwissColors.escrowIndigo),
+                    Row(
+                      children: [
+                        Icon(
+                          order.metodePenyerahan == 'antar_admin'
+                              ? Icons.local_shipping_outlined
+                              : Icons.place_outlined,
+                          size: 14,
+                          color: CampusColors.campusForest,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            order.metodePenyerahan == 'antar_admin'
+                                ? 'Diantar Kurir Admin ke Kos Mahasiswa'
+                                : 'COD di Kampus (${order.titikCod})',
+                            style: SwissTheme.sans(
+                              size: 11.5,
+                              weight: FontWeight.w600,
+                              color: CampusColors.campusForest,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

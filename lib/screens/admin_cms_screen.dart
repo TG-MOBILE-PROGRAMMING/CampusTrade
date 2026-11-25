@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../state/app_state.dart';
 import '../theme/swiss_theme.dart';
+import '../widgets/campus_empty_state.dart';
+import '../widgets/campus_motion.dart';
 import '../widgets/geospatial_map_widget.dart';
 
 /// ============================================================================
-/// ADMIN CMS CONSOLE: 5 FULL-WIDTH RESPONSIVE MODULES (LINEAR DARK MODE)
+/// ADMIN CMS CONSOLE: 5 FULL-WIDTH RESPONSIVE MODULES ("FOREST SLATE" DARK MODE)
+/// Dial: ENERGY 2 / RHYTHM 2 / MOTION 2 (see DESIGN.md Section 9)
 /// ============================================================================
 /// 1. Ringkasan & Trafik (admin/index.php)
 /// 2. Inventaris & QC Barang (admin/products.php)
@@ -98,11 +101,37 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
               child: Column(
                 children: [
                   _buildAdminNavbar(isDesktop),
-                  _buildFlashBanner(),
+                  AnimatedSwitcher(
+                    duration: CampusMotion.standard,
+                    child: _buildFlashBanner(),
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.all(isDesktop ? 28 : 16),
-                      child: _buildActiveTabContent(width),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        switchInCurve: CampusMotion.easeOut,
+                        transitionBuilder: (child, animation) {
+                          if (MediaQuery.disableAnimationsOf(context)) {
+                            return child;
+                          }
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.015),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: KeyedSubtree(
+                          key: ValueKey<String>(widget.appState.currentAdminTab),
+                          child: _buildActiveTabContent(width),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -147,21 +176,14 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: SwissColors.linearLavender,
+                            color: CampusColors.campusForestLight,
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x336366F1),
-                                blurRadius: 10,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
                           ),
                           alignment: Alignment.center,
-                          child: Text(
-                            'CT',
-                            style: SwissTheme.display(
-                                size: 14, weight: FontWeight.w800, color: SwissColors.white),
+                          child: const Icon(
+                            Icons.swap_horiz_rounded,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -400,41 +422,62 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
     bool isDrawer = false,
   }) {
     final bool active = widget.appState.currentAdminTab == tab;
+    const Color sageAccent = CampusColors.adminSky;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
-      child: InkWell(
+      child: TactilePress(
         onTap: () {
           widget.appState.setAdminTab(tab);
           if (isDrawer) Navigator.pop(context);
         },
         borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        pressedScale: 0.985,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: CampusMotion.easeOut,
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: active
-                ? SwissColors.linearLavender.withValues(alpha: 0.15)
+                ? sageAccent.withValues(alpha: 0.14)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: active
-                ? Border.all(
-                    color: SwissColors.linearLavender.withValues(alpha: 0.35))
-                : Border.all(color: Colors.transparent),
+            border: Border.all(
+              color: active
+                  ? sageAccent.withValues(alpha: 0.35)
+                  : Colors.transparent,
+            ),
           ),
           child: Row(
             children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 3,
+                height: active ? 18 : 0,
+                margin: EdgeInsets.only(right: active ? 10 : 0),
+                decoration: BoxDecoration(
+                  color: sageAccent,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               Icon(
                 icon,
                 size: 18,
-                color: active ? SwissColors.linearLavender : SwissColors.adminTextLow,
+                color: active ? sageAccent : SwissColors.adminTextLow,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 11),
               Expanded(
                 child: Text(
                   label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: SwissTheme.sans(
-                    size: 12,
+                    size: 12.5,
                     weight: active ? FontWeight.w700 : FontWeight.w500,
-                    color: active ? SwissColors.adminTextHigh : SwissColors.adminTextLow,
+                    color: active
+                        ? SwissColors.adminTextHigh
+                        : SwissColors.adminTextLow,
                   ),
                 ),
               ),
@@ -443,16 +486,15 @@ class _AdminCmsScreenState extends State<AdminCmsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: active ? SwissColors.linearLavender : SwissColors.adminElevated,
+                    color: CampusColors.terracotta,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: SwissColors.adminHairline),
                   ),
                   child: Text(
                     '$badgeCount',
                     style: SwissTheme.mono(
                       size: 10,
                       weight: FontWeight.w700,
-                      color: active ? SwissColors.white : SwissColors.adminTextHigh,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -753,19 +795,19 @@ class _AdminDashboardView extends StatelessWidget {
                     appState.setAdminTab('users');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: SwissColors.linearLavender,
+                    backgroundColor: CampusColors.terracotta,
                     foregroundColor: SwissColors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                        horizontal: 16, vertical: 11),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Text(
-                    'Tinjau Antrean KTM ($pendingKtm) ->',
+                    'Tinjau Antrean KTM ($pendingKtm)',
                     style: SwissTheme.sans(
                         size: 12,
-                        weight: FontWeight.w600,
+                        weight: FontWeight.w700,
                         color: SwissColors.white),
                   ),
                 ),
@@ -785,43 +827,55 @@ class _AdminDashboardView extends StatelessWidget {
           spacing: 14,
           runSpacing: 14,
           children: [
-            _kpiCard(
-              title: 'TRAFIK KUNJUNGAN',
-              badge: 'HARI INI',
-              badgeColor: SwissColors.linearLavender,
-              badgeBg: SwissColors.adminElevated,
-              mainValue: '${appState.todayVisits}',
-              subValue: 'AKUMULATIF: ${appState.totalVisits} HITS',
+            StaggeredEntrance(
+              index: 0,
+              child: _kpiCard(
+                title: 'Trafik Kunjungan',
+                badge: 'HARI INI',
+                badgeColor: CampusColors.adminSky,
+                badgeBg: SwissColors.adminElevated,
+                mainValue: '${appState.todayVisits}',
+                subValue: 'Akumulatif: ${appState.totalVisits} kunjungan',
+              ),
             ),
-            _kpiCard(
-              title: 'SESI AKTIF (ONLINE)',
-              badge: 'LIVE',
-              badgeColor: SwissColors.verifiedEmerald,
-              badgeBg: SwissColors.adminElevated,
-              mainValue: '${appState.onlineUsersList.length} User',
-              mainColor: SwissColors.verifiedEmerald,
-              subValue: 'RENTANG 15 MENIT TERAKHIR',
+            StaggeredEntrance(
+              index: 1,
+              child: _kpiCard(
+                title: 'Sesi Aktif Online',
+                badge: 'AKTIF',
+                badgeColor: CampusColors.adminSky,
+                badgeBg: SwissColors.adminElevated,
+                mainValue: '${appState.onlineUsersList.length} User',
+                mainColor: CampusColors.adminSky,
+                subValue: 'Rentang 15 menit terakhir',
+              ),
             ),
-            _kpiCard(
-              title: 'UNIT KATALOG',
-              badge: 'KELOLA ->',
-              badgeColor: SwissColors.linearLavender,
-              badgeBg: SwissColors.adminElevated,
-              mainValue: '${appState.countApprovedProducts} Tayang',
-              subValue:
-                  '${appState.countPendingProducts} MENUNGGU INSPEKSI QC',
-              subColor: SwissColors.cautionAmber,
-              onTapBadge: () => appState.setAdminTab('products'),
+            StaggeredEntrance(
+              index: 2,
+              child: _kpiCard(
+                title: 'Unit Katalog',
+                badge: 'Kelola',
+                badgeColor: CampusColors.adminSky,
+                badgeBg: SwissColors.adminElevated,
+                mainValue: '${appState.countApprovedProducts} Tayang',
+                subValue:
+                    '${appState.countPendingProducts} menunggu inspeksi QC',
+                subColor: SwissColors.adminAccentAmber,
+                onTapBadge: () => appState.setAdminTab('products'),
+              ),
             ),
-            _kpiCard(
-              title: 'FEE JASA VERIFIKASI',
-              badge: 'REKBER',
-              badgeColor: SwissColors.escrowIndigo,
-              badgeBg: SwissColors.adminElevated,
-              mainValue:
-                  SwissTheme.formatRupiah(appState.totalAdminFeePotential),
-              subValue:
-                  'VALUASI: ${SwissTheme.formatRupiah(appState.totalValuation)}',
+            StaggeredEntrance(
+              index: 3,
+              child: _kpiCard(
+                title: 'Potensi Fee Rekber',
+                badge: 'REKBER',
+                badgeColor: const Color(0xFFE07A5F),
+                badgeBg: SwissColors.adminElevated,
+                mainValue:
+                    SwissTheme.formatRupiah(appState.totalAdminFeePotential),
+                subValue:
+                    'Valuasi: ${SwissTheme.formatRupiah(appState.totalValuation)}',
+              ),
             ),
           ],
         ),
@@ -896,12 +950,18 @@ class _AdminDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: SwissTheme.mono(size: 10, color: SwissColors.adminTextLow),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SwissTheme.label(size: 11, color: SwissColors.adminTextLow),
+                ),
               ),
+              const SizedBox(width: 6),
               InkWell(
                 onTap: onTapBadge,
+                borderRadius: BorderRadius.circular(4),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1296,10 +1356,16 @@ class _AdminDashboardView extends StatelessWidget {
                 const SizedBox(width: 8),
                 InkWell(
                   onTap: () => appState.setAdminTab('products'),
-                  child: Text(
-                    'LIHAT SEMUA ->',
-                    style: SwissTheme.mono(
-                        size: 10, color: SwissColors.linearLavender),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Text(
+                      'Lihat Semua',
+                      style: SwissTheme.sans(
+                          size: 11.5,
+                          weight: FontWeight.w700,
+                          color: CampusColors.adminSky),
+                    ),
                   ),
                 ),
               ],
@@ -1411,14 +1477,23 @@ class _AdminDashboardView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Distribusi Titik COD',
+                  Expanded(
+                    child: Text(
+                      'Distribusi Titik COD',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: SwissTheme.display(
                         size: 14,
                         color: SwissColors.adminTextHigh,
-                      )),
-                  Text('ZONA KAMPUS TARGET',
-                      style: SwissTheme.mono(
-                          size: 10, color: SwissColors.adminTextLow)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'ZONA KAMPUS',
+                    style: SwissTheme.mono(
+                        size: 9.5, color: SwissColors.adminTextLow),
+                  ),
                 ],
               ),
               const SizedBox(height: 14),
@@ -1923,8 +1998,27 @@ class _AdminProductsViewState extends State<_AdminProductsView> {
         ),
         const SizedBox(height: 16),
 
-        // Dual Responsive View
-        if (!isDesktop)
+        // Dual Responsive View + Relatable Empty State
+        if (list.isEmpty)
+          CampusEmptyState(
+            isDark: true,
+            kind: CampusEmptyKind.searchEmpty,
+            title: s.adminProductStatusFilter == 'pending'
+                ? 'Antrean kurasi barang sudah bersih'
+                : 'Belum ada unit barang di filter ini',
+            subtitle:
+                'Tidak ditemukan inventaris kos yang cocok dengan kata kunci atau filter status saat ini.',
+            primaryActionLabel: 'Reset Filter Inventaris',
+            onPrimaryAction: () {
+              _searchCtrl.clear();
+              setState(() {
+                s.adminProductSearch = '';
+                s.adminProductCategoryFilter = 'all';
+                s.adminProductStatusFilter = 'all';
+              });
+            },
+          )
+        else if (!isDesktop)
           Column(
             children: list.map((prod) {
               return Container(
@@ -2771,7 +2865,26 @@ class _AdminUsersViewState extends State<_AdminUsersView> {
         ),
         const SizedBox(height: 16),
 
-        if (isDesktop)
+        if (users.isEmpty)
+          CampusEmptyState(
+            isDark: true,
+            kind: CampusEmptyKind.ordersEmpty,
+            title: s.adminUserStatusFilter == 'pending'
+                ? 'Semua berkas KTM sudah terverifikasi'
+                : 'Mahasiswa tidak ditemukan',
+            subtitle:
+                'Coba ubah filter status KTM atau bersihkan pencarian NIM dan nama mahasiswa.',
+            primaryActionLabel: 'Tampilkan Semua Mahasiswa',
+            onPrimaryAction: () {
+              _searchCtrl.clear();
+              setState(() {
+                s.adminUserSearch = '';
+                s.adminUserStatusFilter = 'all';
+                s.adminUserRoleFilter = 'all';
+              });
+            },
+          )
+        else if (isDesktop)
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -3227,8 +3340,21 @@ class _AdminCodSpotsViewState extends State<_AdminCodSpotsView> {
         ),
         const SizedBox(height: 16),
 
-        // Spots List
-        ...spots.map((spot) {
+        // Spots List or Relatable Empty State
+        if (spots.isEmpty)
+          CampusEmptyState(
+            isDark: true,
+            kind: CampusEmptyKind.listingsEmpty,
+            title: 'Titik COD tidak ditemukan',
+            subtitle:
+                'Belum ada titik temu kampus yang cocok dengan kata kunci pencarianmu.',
+            primaryActionLabel: 'Tampilkan Semua Titik COD',
+            onPrimaryAction: () {
+              setState(() => s.adminCodSpotSearch = '');
+            },
+          )
+        else
+          ...spots.map((spot) {
           final bool isActive = spot.status == 'aktif';
           return Container(
             margin: const EdgeInsets.only(bottom: 10),
